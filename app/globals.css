@@ -680,13 +680,11 @@ select.textField {
 .historyTableWrap,
 .leaderboardTableWrap {
   overflow-x: auto;
-}
-
-.scoreboardWrap {
   border-radius: 24px;
+  border: 1px solid rgba(242, 238, 229, 0.075);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.018), rgba(255, 255, 255, 0.006)),
-    rgba(255, 255, 255, 0.008);
+    radial-gradient(circle at top left, rgba(216, 175, 104, 0.055), transparent 32%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.028), rgba(255, 255, 255, 0.01));
 }
 
 .scoreTable {
@@ -697,7 +695,7 @@ select.textField {
 
 .scoreTable th,
 .scoreTable td {
-  padding: 12px 10px;
+  padding: 10px 12px;
   border-bottom: 1px solid rgba(242, 238, 229, 0.045);
   text-align: left;
   vertical-align: middle;
@@ -711,14 +709,30 @@ select.textField {
 }
 
 .scoreTable thead th {
-  padding-top: 10px;
-  padding-bottom: 12px;
+  padding-top: 12px;
+  padding-bottom: 11px;
   border-bottom-color: rgba(242, 238, 229, 0.075);
+}
+
+.scoreTable tbody tr {
+  transition: background-color 0.16s ease;
+}
+
+.scoreTable tbody tr:not(.summaryRow):nth-child(even) {
+  background: rgba(255, 255, 255, 0.012);
+}
+
+.scoreTable tbody tr:not(.summaryRow):hover {
+  background: rgba(216, 175, 104, 0.04);
+}
+
+.scoreTable tbody tr:last-child td {
+  border-bottom: 0;
 }
 
 .playerColumnHeader {
   display: grid;
-  gap: 12px;
+  gap: 8px;
 }
 
 .playerColumnHeader > span:first-child {
@@ -731,7 +745,7 @@ select.textField {
 .playerColumnSubheads {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+  gap: 8px;
   color: rgba(242, 238, 229, 0.48);
   font-size: 0.58rem;
   letter-spacing: 0.14em;
@@ -739,11 +753,11 @@ select.textField {
 
 .roundBadge {
   display: inline-flex;
-  width: 42px;
-  height: 42px;
+  width: 34px;
+  height: 34px;
   align-items: center;
   justify-content: center;
-  border-radius: 14px;
+  border-radius: 12px;
   background: rgba(255, 255, 255, 0.028);
   color: rgba(241, 205, 140, 0.88);
   font-weight: 700;
@@ -889,43 +903,17 @@ select.textField {
   font-size: 2rem;
 }
 
-.leaderboardTableWrap {
-  border: 1px solid rgba(242, 238, 229, 0.075);
-  border-radius: 24px;
-  background:
-    radial-gradient(circle at top left, rgba(216, 175, 104, 0.09), transparent 34%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.012));
-}
-
 .leaderboardTable {
-  min-width: 1080px;
+  min-width: 980px;
 }
 
 .leaderboardTable th,
 .leaderboardTable td {
-  padding: 18px 22px;
+  padding: 12px 14px;
 }
 
 .leaderboardTable thead th {
-  border-bottom-color: rgba(216, 175, 104, 0.22);
-  background: rgba(255, 255, 255, 0.018);
   white-space: normal;
-}
-
-.leaderboardTable tbody td {
-  border-bottom-color: rgba(242, 238, 229, 0.055);
-}
-
-.leaderboardTable tbody tr {
-  transition: background-color 0.16s ease, transform 0.16s ease;
-}
-
-.leaderboardTable tbody tr:nth-child(even) {
-  background: rgba(255, 255, 255, 0.014);
-}
-
-.leaderboardTable tbody tr:hover {
-  background: rgba(216, 175, 104, 0.055);
 }
 
 .sortableHeader {
@@ -1098,8 +1086,8 @@ select.textField {
 .miniSelect {
   appearance: none;
   width: 100%;
-  min-height: 36px;
-  padding: 0 32px 0 12px;
+  min-height: 32px;
+  padding: 0 28px 0 11px;
   border: 1px solid rgba(242, 238, 229, 0.16);
   border-radius: 12px;
   background:
@@ -1128,8 +1116,8 @@ select.textField {
 }
 
 .scoreBadge {
-  min-height: 32px;
-  padding: 0 12px;
+  min-height: 28px;
+  padding: 0 10px;
   font-weight: 700;
 }
 
@@ -1195,28 +1183,30 @@ select.textField {
 
 .enhancedTable th:nth-child(1),
 .enhancedTable td:nth-child(1) {
-  min-width: 64px;
+  width: 56px;
+  min-width: 56px;
 }
 
 .enhancedTable th:nth-child(2),
 .enhancedTable td:nth-child(2) {
-  min-width: 140px;
+  width: 110px;
+  min-width: 110px;
 }
 
 .enhancedTable th:nth-child(n + 3),
 .enhancedTable td:nth-child(n + 3) {
-  min-width: 230px;
+  min-width: 190px;
 }
 
 .compactRoundPlayerCell {
-  min-width: 204px;
-  gap: 8px;
+  min-width: 176px;
+  gap: 7px;
 }
 
 .inlineFieldsRow {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
+  gap: 7px;
 }
 
 .inlineFieldGroup {
@@ -1225,7 +1215,7 @@ select.textField {
 
 .roundPlayerScore {
   width: 100%;
-  min-height: 32px;
+  min-height: 28px;
 }
 
 @media (max-width: 840px) {
@@ -1235,7 +1225,7 @@ select.textField {
 
   .enhancedTable th:nth-child(n + 3),
   .enhancedTable td:nth-child(n + 3) {
-    min-width: 220px;
+    min-width: 190px;
   }
 }
 
