@@ -1,4 +1,20 @@
 services:
+  caddy:
+    image: caddy:2-alpine
+    container_name: joker-caddy
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      - app
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+
   app:
     build:
       context: .
@@ -7,10 +23,12 @@ services:
     restart: unless-stopped
     env_file:
       - .env
-    ports:
-      - "80:3000"
+    expose:
+      - "3000"
     volumes:
       - joker-data:/data
 
 volumes:
   joker-data:
+  caddy-data:
+  caddy-config:

@@ -1,0 +1,8 @@
+{$JOKER_DOMAIN} {
+  encode zstd gzip
+  reverse_proxy app:3000
+}
+
+www.{$JOKER_DOMAIN} {
+  redir https://{$JOKER_DOMAIN}{uri} permanent
+}
