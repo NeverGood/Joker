@@ -426,12 +426,14 @@ export default function GameBoard({ registeredPlayers = [], readOnly = false }) 
             <button type="button" className="primaryButton" onClick={saveGame} disabled={readOnly}>
               Сохранить партию в базу
             </button>
-            <button type="button" className="secondaryButton compactActionButton" onClick={fillRandomGame} disabled={readOnly}>
-              Заполнить таблицу случайными данными
-            </button>
-            <button type="button" className="secondaryButton compactActionButton" onClick={resetCurrentGame} disabled={readOnly}>
-              Очистить текущую таблицу
-            </button>
+            <div className="secondaryActionsRow">
+              <button type="button" className="secondaryButton compactActionButton" onClick={fillRandomGame} disabled={readOnly}>
+                Заполнить случайно
+              </button>
+              <button type="button" className="secondaryButton compactActionButton" onClick={resetCurrentGame} disabled={readOnly}>
+                Очистить таблицу
+              </button>
+            </div>
           </div>
         </div>
       </section>
