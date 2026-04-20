@@ -250,7 +250,7 @@ export default function GameBoard({ registeredPlayers = [], readOnly = false }) 
       return;
     }
 
-    if (!window.confirm('Очистить текущую партию? Все заполненные значения будут сброшены.')) {
+    if (!window.confirm('Очистить текущую таблицу? Все заполненные значения будут сброшены.')) {
       return;
     }
 
@@ -260,6 +260,10 @@ export default function GameBoard({ registeredPlayers = [], readOnly = false }) 
 
   function fillRandomGame() {
     if (readOnly) {
+      return;
+    }
+
+    if (!window.confirm('Заполнить таблицу случайными данными? Текущие значения раздач будут заменены.')) {
       return;
     }
 
@@ -422,10 +426,10 @@ export default function GameBoard({ registeredPlayers = [], readOnly = false }) 
             <button type="button" className="primaryButton" onClick={saveGame} disabled={readOnly}>
               Сохранить партию в базу
             </button>
-            <button type="button" className="secondaryButton" onClick={fillRandomGame} disabled={readOnly}>
+            <button type="button" className="secondaryButton compactActionButton" onClick={fillRandomGame} disabled={readOnly}>
               Заполнить таблицу случайными данными
             </button>
-            <button type="button" className="secondaryButton" onClick={resetCurrentGame} disabled={readOnly}>
+            <button type="button" className="secondaryButton compactActionButton" onClick={resetCurrentGame} disabled={readOnly}>
               Очистить текущую таблицу
             </button>
           </div>
