@@ -480,6 +480,26 @@ export default function GameBoard({ registeredPlayers = [], readOnly = false }) 
             </tbody>
           </table>
         </div>
+        <div className="mobileRoundsStack">
+          {ROUND_PRESET.map((round, index) => {
+            const showBlockSummary =
+              index === ROUND_PRESET.length - 1 ||
+              ROUND_PRESET[index + 1].blockId !== round.blockId;
+            const blockSummary = blockTotals.find((block) => block.id === round.blockId);
+
+            return (
+              <RoundCard
+                key={`mobile-${round.id}`}
+                round={round}
+                currentGame={currentGame}
+                updateRoundValue={updateRoundValue}
+                readOnly={readOnly}
+                showBlockSummary={showBlockSummary}
+                blockSummary={blockSummary}
+              />
+            );
+          })}
+        </div>
       </section>
 
     </ScoreboardShell>
@@ -542,68 +562,18 @@ function RoundRows({ round, currentGame, updateRoundValue, readOnly, showBlockSu
           </div>
         </td>
         {PLAYER_KEYS.map((playerKey) => {
-          const roundEntry = roundState[playerKey];
-          const score = calculatePlayerRoundScore(roundEntry, round.cards);
-          const isLastBidder = playerKey === round.lastBidderKey;
-          const currentBid = normalizeInteger(roundEntry.bid);
-          const hasForbiddenBid = isLastBidder && forbiddenLastBid !== null && currentBid === forbiddenLastBid;
-          const premiumScore = blockSummary?.bonuses?.[playerKey] ?? 0;
-          const cutScore = blockSummary?.cutRounds?.[playerKey]?.[round.id] ?? 0;
-          const isPremiumScore = premiumScore > 0 && round.id === blockSummary?.lastRoundId;
-          const isCutScore = cutScore > 0;
-          const isInvalidScore = hasForbiddenBid || hasInvalidTrickTotal;
-          const displayScore = isInvalidScore ? '—' : isPremiumScore ? premiumScore : score ?? '—';
-
           return (
             <td key={playerKey}>
-              <div className="roundPlayerCell compactRoundPlayerCell">
-                <div className="inlineFieldsRow">
-                  <div className="miniFieldGroup inlineFieldGroup">
-                    <select
-                      aria-label={`${currentGame.players[playerKey] || DEFAULT_PLAYERS[playerKey]} заказ`}
-                      className={`miniSelect ${hasForbiddenBid ? 'miniSelectInvalid' : ''}`}
-                      value={roundEntry.bid}
-                      onChange={(event) => updateRoundValue(round.id, playerKey, 'bid', event.target.value)}
-                      disabled={readOnly}
-                    >
-                      <option value="">-</option>
-                      {getNumberOptions(round.cards).map((value) => (
-                        <option
-                          key={value}
-                          value={value}
-                          disabled={isLastBidder && forbiddenLastBid !== null && value === forbiddenLastBid}
-                        >
-                          {value}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="miniFieldGroup inlineFieldGroup">
-                    <select
-                      aria-label={`${currentGame.players[playerKey] || DEFAULT_PLAYERS[playerKey]} взятка`}
-                      className="miniSelect"
-                      value={roundEntry.tricks}
-                      onChange={(event) => updateRoundValue(round.id, playerKey, 'tricks', event.target.value)}
-                      disabled={readOnly}
-                    >
-                      <option value="">-</option>
-                      {getNumberOptions(round.cards).map((value) => (
-                        <option key={value} value={value}>
-                          {value}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                <div className={`scoreBadge roundPlayerScore ${getScoreBadgeClass(score, isInvalidScore, {
-                  isPremium: isPremiumScore,
-                  isCut: isCutScore
-                })}`}>
-                  {displayScore}
-                </div>
-              </div>
+              <RoundPlayerFields
+                round={round}
+                currentGame={currentGame}
+                playerKey={playerKey}
+                updateRoundValue={updateRoundValue}
+                readOnly={readOnly}
+                blockSummary={blockSummary}
+                forbiddenLastBid={forbiddenLastBid}
+                hasInvalidTrickTotal={hasInvalidTrickTotal}
+              />
             </td>
           );
         })}
@@ -622,6 +592,144 @@ function RoundRows({ round, currentGame, updateRoundValue, readOnly, showBlockSu
         </tr>
       ) : null}
     </>
+  );
+}
+
+function RoundCard({ round, currentGame, updateRoundValue, readOnly, showBlockSummary, blockSummary }) {
+  const roundState = currentGame.rounds[round.id];
+  const forbiddenLastBid = getLastBidRestriction(round, roundState);
+  const trickTotal = getRoundTrickTotal(roundState);
+  const areTricksFilled = isRoundTricksFilled(roundState);
+  const hasInvalidTrickTotal = areTricksFilled && trickTotal !== round.cards;
+
+  return (
+    <article className="mobileRoundCard">
+      <div className="mobileRoundHeader">
+        <div>
+          <span className="mobileRoundEyebrow">Раздача</span>
+          <strong>{round.cards} карт</strong>
+        </div>
+        <span className="dealerPill">{currentGame.players[round.dealerKey] || DEFAULT_PLAYERS[round.dealerKey]}</span>
+      </div>
+
+      {hasInvalidTrickTotal ? (
+        <span className="rowWarning mobileRoundWarning">Взято {trickTotal} из {round.cards}</span>
+      ) : null}
+      {forbiddenLastBid !== null && hasForbiddenLastBid(round, roundState) ? (
+        <span className="rowWarning mobileRoundWarning">Последнему нельзя {forbiddenLastBid}</span>
+      ) : null}
+
+      <div className="mobileRoundPlayers">
+        {PLAYER_KEYS.map((playerKey) => (
+          <RoundPlayerFields
+            key={`${round.id}-${playerKey}`}
+            round={round}
+            currentGame={currentGame}
+            playerKey={playerKey}
+            updateRoundValue={updateRoundValue}
+            readOnly={readOnly}
+            blockSummary={blockSummary}
+            forbiddenLastBid={forbiddenLastBid}
+            hasInvalidTrickTotal={hasInvalidTrickTotal}
+            showPlayerName
+          />
+        ))}
+      </div>
+
+      {showBlockSummary ? (
+        <div className="mobileBlockSummary">
+          <span className="summaryLabel">Итого</span>
+          <div className="mobileBlockSummaryGrid">
+            {PLAYER_KEYS.map((playerKey) => (
+              <span key={`${round.id}-mobile-${playerKey}`}>
+                <small>{currentGame.players[playerKey] || DEFAULT_PLAYERS[playerKey]}</small>
+                <strong>{blockSummary?.runningTotals[playerKey] ?? 0}</strong>
+              </span>
+            ))}
+          </div>
+        </div>
+      ) : null}
+    </article>
+  );
+}
+
+function RoundPlayerFields({
+  round,
+  currentGame,
+  playerKey,
+  updateRoundValue,
+  readOnly,
+  blockSummary,
+  forbiddenLastBid,
+  hasInvalidTrickTotal,
+  showPlayerName = false
+}) {
+  const roundState = currentGame.rounds[round.id];
+  const roundEntry = roundState[playerKey];
+  const score = calculatePlayerRoundScore(roundEntry, round.cards);
+  const isLastBidder = playerKey === round.lastBidderKey;
+  const currentBid = normalizeInteger(roundEntry.bid);
+  const hasForbiddenBid = isLastBidder && forbiddenLastBid !== null && currentBid === forbiddenLastBid;
+  const premiumScore = blockSummary?.bonuses?.[playerKey] ?? 0;
+  const cutScore = blockSummary?.cutRounds?.[playerKey]?.[round.id] ?? 0;
+  const isPremiumScore = premiumScore > 0 && round.id === blockSummary?.lastRoundId;
+  const isCutScore = cutScore > 0;
+  const isInvalidScore = hasForbiddenBid || hasInvalidTrickTotal;
+  const displayScore = isInvalidScore ? '—' : isPremiumScore ? premiumScore : score ?? '—';
+  const playerName = currentGame.players[playerKey] || DEFAULT_PLAYERS[playerKey];
+
+  return (
+    <div className={`roundPlayerCell compactRoundPlayerCell ${showPlayerName ? 'mobileRoundPlayerCell' : ''}`}>
+      {showPlayerName ? <span className="mobileRoundPlayerName">{playerName}</span> : null}
+      <div className="inlineFieldsRow">
+        <label className="miniFieldGroup inlineFieldGroup">
+          <span className="mobileMiniLabel">Заказ</span>
+          <select
+            aria-label={`${playerName} заказ`}
+            className={`miniSelect ${hasForbiddenBid ? 'miniSelectInvalid' : ''}`}
+            value={roundEntry.bid}
+            onChange={(event) => updateRoundValue(round.id, playerKey, 'bid', event.target.value)}
+            disabled={readOnly}
+          >
+            <option value="">-</option>
+            {getNumberOptions(round.cards).map((value) => (
+              <option
+                key={value}
+                value={value}
+                disabled={isLastBidder && forbiddenLastBid !== null && value === forbiddenLastBid}
+              >
+                {value}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className="miniFieldGroup inlineFieldGroup">
+          <span className="mobileMiniLabel">Взятка</span>
+          <select
+            aria-label={`${playerName} взятка`}
+            className="miniSelect"
+            value={roundEntry.tricks}
+            onChange={(event) => updateRoundValue(round.id, playerKey, 'tricks', event.target.value)}
+            disabled={readOnly}
+          >
+            <option value="">-</option>
+            {getNumberOptions(round.cards).map((value) => (
+              <option key={value} value={value}>
+                {value}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+
+      <div className={`scoreBadge roundPlayerScore ${getScoreBadgeClass(score, isInvalidScore, {
+        isPremium: isPremiumScore,
+        isCut: isCutScore
+      })}`}>
+        {displayScore}
+      </div>
+    </div>
   );
 }
 
