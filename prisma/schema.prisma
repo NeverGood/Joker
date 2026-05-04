@@ -12,6 +12,7 @@ model Game {
   title        String
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+  durationSeconds Int   @default(0)
   player1Name  String
   player2Name  String
   player3Name  String

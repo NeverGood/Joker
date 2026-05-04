@@ -490,6 +490,71 @@ select.textField {
   margin: 18px 0 22px;
 }
 
+.gameSessionPanel {
+  display: grid;
+  gap: 14px;
+  margin: 18px 0 0;
+  padding: 18px;
+  border: 1px solid rgba(242, 238, 229, 0.1);
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at top left, rgba(216, 175, 104, 0.09), transparent 34%),
+    rgba(255, 255, 255, 0.025);
+}
+
+.gameSessionMeta,
+.gameSessionActions {
+  display: grid;
+  gap: 12px;
+}
+
+.gameSessionMeta {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.gameSessionItem {
+  display: grid;
+  gap: 6px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.gameSessionLabel {
+  color: rgba(242, 238, 229, 0.54);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.gameSessionValue {
+  color: var(--text);
+  font-size: 1.12rem;
+  font-weight: 800;
+}
+
+.gameSessionTimer {
+  color: var(--gold-strong);
+  font-variant-numeric: tabular-nums;
+}
+
+.gameStatusidle {
+  color: rgba(242, 238, 229, 0.74);
+}
+
+.gameStatusactive {
+  color: #b8f5b8;
+}
+
+.gameStatusfinished {
+  color: var(--gold-strong);
+}
+
+.gameSessionActions {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .readOnlyNotice {
   margin: 18px 0 0;
   padding: 14px 16px;
@@ -520,6 +585,16 @@ select.textField {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+}
+
+.tableLockNotice {
+  margin: 0 0 16px;
+  padding: 14px 16px;
+  border: 1px solid rgba(216, 175, 104, 0.28);
+  border-radius: 18px;
+  background: rgba(216, 175, 104, 0.1);
+  color: var(--gold-strong);
+  line-height: 1.6;
 }
 
 .chickenWarningBadge {
@@ -957,6 +1032,24 @@ select.textField {
   min-width: 120px;
 }
 
+.inlineToggleButton {
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid rgba(242, 238, 229, 0.16);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.16s ease, background-color 0.16s ease, color 0.16s ease;
+}
+
+.inlineToggleButton:hover,
+.inlineToggleButtonActive {
+  border-color: rgba(241, 205, 140, 0.48);
+  background: rgba(216, 175, 104, 0.12);
+  color: var(--gold-strong);
+}
+
 .historyPlayerName {
   color: var(--text);
   font-size: 0.96rem;
@@ -968,6 +1061,75 @@ select.textField {
   color: var(--gold-strong);
   font-size: 1.05rem;
   font-variant-numeric: tabular-nums;
+}
+
+.protocolCell {
+  padding: 0 !important;
+}
+
+.protocolPanel {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  background:
+    radial-gradient(circle at top left, rgba(216, 175, 104, 0.08), transparent 34%),
+    rgba(255, 255, 255, 0.018);
+}
+
+.protocolPanelHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.protocolPanelTitle {
+  margin: 4px 0 0;
+  color: var(--text);
+  font-size: 1.2rem;
+}
+
+.protocolDuration {
+  color: var(--gold-strong);
+  font-size: 0.95rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.protocolTableWrap {
+  border-radius: 18px;
+}
+
+.protocolTable {
+  min-width: 1040px;
+}
+
+.protocolTable th,
+.protocolTable td {
+  white-space: normal;
+  vertical-align: top;
+}
+
+.protocolRoundMeta,
+.protocolPlayerCell {
+  display: grid;
+  gap: 6px;
+}
+
+.protocolRoundMeta strong,
+.protocolRoundMeta span {
+  white-space: nowrap;
+}
+
+.protocolRoundMeta span,
+.protocolPlayerMeta {
+  color: rgba(242, 238, 229, 0.62);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.protocolScoreBadge {
+  min-width: 96px;
 }
 
 .emptyState {
@@ -1250,6 +1412,18 @@ select.textField {
     margin: 14px 0 16px;
   }
 
+  .gameSessionPanel {
+    gap: 10px;
+    margin-top: 14px;
+    padding: 14px;
+    border-radius: 18px;
+  }
+
+  .gameSessionMeta,
+  .gameSessionActions {
+    grid-template-columns: 1fr;
+  }
+
   .totalRow {
     padding: 12px 14px;
     border-radius: 14px;
@@ -1271,6 +1445,14 @@ select.textField {
   .secondaryActionsRow {
     grid-template-columns: 1fr;
     gap: 8px;
+  }
+
+  .protocolPanel {
+    padding: 14px;
+  }
+
+  .protocolPanelHeader {
+    flex-direction: column;
   }
 
   .compactActionButton {

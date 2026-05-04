@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { Fragment, useEffect, useMemo, useState } from 'react';
 import { DEFAULT_PLAYERS, PLAYER_KEYS } from '../lib/game-config';
+import { buildGameProtocol, formatDurationSeconds } from '../lib/game-storage';
 import ScoreboardShell from './ScoreboardShell';
 
 export default function GlobalSummary() {
@@ -14,6 +15,7 @@ export default function GlobalSummary() {
   const [savingArchiveGame, setSavingArchiveGame] = useState(false);
   const [showArchiveForm, setShowArchiveForm] = useState(false);
   const [archiveForm, setArchiveForm] = useState(() => createArchiveGameForm());
+  const [expandedGameIds, setExpandedGameIds] = useState([]);
   const [leaderboardSort, setLeaderboardSort] = useState({
     key: 'totalWinPoints',
     direction: 'desc'
@@ -208,6 +210,14 @@ export default function GlobalSummary() {
     }));
   }
 
+  function toggleGameProtocol(gameId) {
+    setExpandedGameIds((currentIds) =>
+      currentIds.includes(gameId)
+        ? currentIds.filter((id) => id !== gameId)
+        : [...currentIds, gameId]
+    );
+  }
+
   async function createArchiveGame(event) {
     event.preventDefault();
 
@@ -220,9 +230,15 @@ export default function GlobalSummary() {
     }
 
     const selectedDate = new Date(archiveForm.createdAt);
+    const durationSeconds = parseDurationInput(archiveForm.duration);
 
     if (Number.isNaN(selectedDate.getTime())) {
       window.alert('Укажи корректную дату игры.');
+      return;
+    }
+
+    if (durationSeconds === null) {
+      window.alert('Укажи время игры в формате ЧЧ:ММ:СС или ММ:СС.');
       return;
     }
 
@@ -237,6 +253,7 @@ export default function GlobalSummary() {
           manualArchive: true,
           title: archiveForm.title.trim() || `Партия ${savedGames.length + 1}`,
           createdAt: selectedDate.toISOString(),
+          durationSeconds,
           players: archiveForm.players,
           totals: archiveForm.totals,
           rounds: {}
@@ -406,6 +423,15 @@ export default function GlobalSummary() {
                   onChange={(event) => updateArchiveFormField('createdAt', event.target.value)}
                 />
               </label>
+              <label className="titleField">
+                <span className="fieldLabel">Время игры</span>
+                <input
+                  className="textField"
+                  value={archiveForm.duration}
+                  onChange={(event) => updateArchiveFormField('duration', event.target.value)}
+                  placeholder="Например, 01:24:15"
+                />
+              </label>
             </div>
             <div className="archivePlayersGrid">
               {PLAYER_KEYS.map((playerKey, index) => (
@@ -460,9 +486,11 @@ export default function GlobalSummary() {
                 <tr>
                   <th>Партия</th>
                   <th>Дата</th>
+                  <th>Время игры</th>
                   {PLAYER_KEYS.map((playerKey, index) => (
                     <th key={playerKey}>Игрок {index + 1}</th>
                   ))}
+                  <th>Протокол</th>
                   {isAdmin ? <th>Админ</th> : null}
                 </tr>
               </thead>
@@ -470,54 +498,75 @@ export default function GlobalSummary() {
                 {savedGames.map((game) => {
                   const isEditing = editingGameId === game.id;
                   const isSaving = savingGameId === game.id;
+                  const isExpanded = expandedGameIds.includes(game.id);
+                  const playerColumnCount = PLAYER_KEYS.length + 4 + (isAdmin ? 1 : 0);
 
                   return (
-                    <tr key={game.id}>
-                      <td>{game.title}</td>
-                      <td>{new Date(game.createdAt).toLocaleString('ru-RU')}</td>
-                      {PLAYER_KEYS.map((playerKey) => (
-                        <td key={`${game.id}-${playerKey}`}>
-                          <div className="historyPlayerCell">
-                            <span className="historyPlayerName">{getPlayerName(game, playerKey)}</span>
-                            {isAdmin && isEditing ? (
-                              <input
-                                className="adminScoreInput"
-                                type="number"
-                                value={game.totals[playerKey]}
-                                onChange={(event) => updateSavedGameTotal(game.id, playerKey, event.target.value)}
-                              />
-                            ) : (
-                              <strong className="historyScoreValue">{game.totals[playerKey]}</strong>
-                            )}
-                          </div>
-                        </td>
-                      ))}
-                      {isAdmin ? (
+                    <Fragment key={game.id}>
+                      <tr key={game.id}>
+                        <td>{game.title}</td>
+                        <td>{new Date(game.createdAt).toLocaleString('ru-RU')}</td>
+                        <td>{game.durationSeconds > 0 ? formatDurationSeconds(game.durationSeconds) : '—'}</td>
+                        {PLAYER_KEYS.map((playerKey) => (
+                          <td key={`${game.id}-${playerKey}`}>
+                            <div className="historyPlayerCell">
+                              <span className="historyPlayerName">{getPlayerName(game, playerKey)}</span>
+                              {isAdmin && isEditing ? (
+                                <input
+                                  className="adminScoreInput"
+                                  type="number"
+                                  value={game.totals[playerKey]}
+                                  onChange={(event) => updateSavedGameTotal(game.id, playerKey, event.target.value)}
+                                />
+                              ) : (
+                                <strong className="historyScoreValue">{game.totals[playerKey]}</strong>
+                              )}
+                            </div>
+                          </td>
+                        ))}
                         <td>
-                          <div className="adminActions">
-                            <button
-                              type="button"
-                              className={`iconActionButton ${isEditing ? 'iconActionButtonActive' : ''}`}
-                              onClick={() => handleEditAction(game)}
-                              disabled={isSaving}
-                              aria-label={isEditing ? 'Сохранить изменения' : 'Редактировать счет партии'}
-                              title={isEditing ? 'Сохранить' : 'Редактировать'}
-                            >
-                              {isEditing ? <CheckIcon /> : <PencilIcon />}
-                            </button>
-                            <button
-                              type="button"
-                              className="iconActionButton iconActionButtonDanger"
-                              onClick={() => deleteSavedGame(game.id)}
-                              aria-label="Удалить сохраненную игру"
-                              title="Удалить"
-                            >
-                              <TrashIcon />
-                            </button>
-                          </div>
+                          <button
+                            type="button"
+                            className={`inlineToggleButton ${isExpanded ? 'inlineToggleButtonActive' : ''}`}
+                            onClick={() => toggleGameProtocol(game.id)}
+                          >
+                            {isExpanded ? 'Свернуть' : 'Развернуть'}
+                          </button>
                         </td>
+                        {isAdmin ? (
+                          <td>
+                            <div className="adminActions">
+                              <button
+                                type="button"
+                                className={`iconActionButton ${isEditing ? 'iconActionButtonActive' : ''}`}
+                                onClick={() => handleEditAction(game)}
+                                disabled={isSaving}
+                                aria-label={isEditing ? 'Сохранить изменения' : 'Редактировать счет партии'}
+                                title={isEditing ? 'Сохранить' : 'Редактировать'}
+                              >
+                                {isEditing ? <CheckIcon /> : <PencilIcon />}
+                              </button>
+                              <button
+                                type="button"
+                                className="iconActionButton iconActionButtonDanger"
+                                onClick={() => deleteSavedGame(game.id)}
+                                aria-label="Удалить сохраненную игру"
+                                title="Удалить"
+                              >
+                                <TrashIcon />
+                              </button>
+                            </div>
+                          </td>
+                        ) : null}
+                      </tr>
+                      {isExpanded ? (
+                        <tr key={`${game.id}-protocol`}>
+                          <td colSpan={playerColumnCount} className="protocolCell">
+                            <GameProtocolView game={game} />
+                          </td>
+                        </tr>
                       ) : null}
-                    </tr>
+                    </Fragment>
                   );
                 })}
               </tbody>
@@ -577,11 +626,34 @@ function createArchiveGameForm(users = [], currentForm = null) {
   return {
     title: currentForm?.title || '',
     createdAt: currentForm?.createdAt || formatDateTimeLocal(new Date()),
+    duration: currentForm?.duration || '',
     players: fallbackPlayers,
     totals: Object.fromEntries(
       PLAYER_KEYS.map((playerKey) => [playerKey, currentForm?.totals?.[playerKey] ?? '0'])
     )
   };
+}
+
+function parseDurationInput(value) {
+  const normalized = String(value || '').trim();
+
+  if (!normalized) {
+    return 0;
+  }
+
+  const parts = normalized.split(':').map((part) => Number.parseInt(part, 10));
+
+  if (![2, 3].includes(parts.length) || parts.some((part) => !Number.isFinite(part) || part < 0)) {
+    return null;
+  }
+
+  if (parts.length === 2) {
+    const [minutes, seconds] = parts;
+    return minutes * 60 + seconds;
+  }
+
+  const [hours, minutes, seconds] = parts;
+  return hours * 3600 + minutes * 60 + seconds;
 }
 
 function formatDateTimeLocal(date) {
@@ -676,4 +748,96 @@ function formatAverage(value) {
   return new Intl.NumberFormat('ru-RU', {
     maximumFractionDigits: 1
   }).format(value);
+}
+
+function GameProtocolView({ game }) {
+  const protocol = Array.isArray(game?.protocol) && game.protocol.length > 0
+    ? game.protocol
+    : buildGameProtocol(game?.players, game?.rounds || {});
+  const hasFilledRounds = protocol.some((round) =>
+    PLAYER_KEYS.some((playerKey) => {
+      const entry = round.players?.[playerKey];
+      return entry?.bid !== null || entry?.tricks !== null;
+    })
+  );
+
+  return (
+    <div className="protocolPanel">
+      <div className="protocolPanelHeader">
+        <div>
+          <p className="sectionEyebrow">Протокол партии</p>
+          <h3 className="protocolPanelTitle">{game.title}</h3>
+        </div>
+        <span className="protocolDuration">
+          Время: {game.durationSeconds > 0 ? formatDurationSeconds(game.durationSeconds) : '—'}
+        </span>
+      </div>
+      {!hasFilledRounds ? (
+        <div className="emptyState">
+          Для этой партии сохранен только общий счет. Полный протокол ходов в архив не был записан.
+        </div>
+      ) : null}
+      {hasFilledRounds ? (
+      <div className="historyTableWrap protocolTableWrap">
+        <table className="scoreTable compactTable protocolTable">
+          <thead>
+            <tr>
+              <th>Ход</th>
+              {PLAYER_KEYS.map((playerKey) => (
+                <th key={`${game.id}-protocol-head-${playerKey}`}>
+                  {getPlayerName(game, playerKey)}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {protocol.map((round) => (
+              <tr key={`${game.id}-${round.roundId}`}>
+                <td>
+                  <div className="protocolRoundMeta">
+                    <strong>Ход {round.hand}</strong>
+                    <span>{round.cards} карт</span>
+                    <span>Раздает {round.dealerName}</span>
+                  </div>
+                </td>
+                {PLAYER_KEYS.map((playerKey) => {
+                  const entry = round.players?.[playerKey] || {};
+                  const displayScore = entry.displayedScore ?? '—';
+
+                  return (
+                    <td key={`${game.id}-${round.roundId}-${playerKey}`}>
+                      <div className="protocolPlayerCell">
+                        <span className="protocolPlayerMeta">
+                          Заказ: {entry.bid ?? '—'} | Взятка: {entry.tricks ?? '—'}
+                        </span>
+                        <span className={`scoreBadge protocolScoreBadge ${getProtocolScoreBadgeClass(entry)}`}>
+                          {displayScore}
+                        </span>
+                      </div>
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      ) : null}
+    </div>
+  );
+}
+
+function getProtocolScoreBadgeClass(entry) {
+  switch (entry?.scoreType) {
+    case 'premium':
+      return 'scoreBadgePremium';
+    case 'cut':
+      return 'scoreBadgeCut';
+    case 'positive':
+      return 'scoreBadgePositive';
+    case 'negative':
+      return 'scoreBadgeNegative';
+    default:
+      return 'scoreBadgeSoft';
+  }
 }

@@ -16,6 +16,7 @@ import {
   isRoundTricksFilled,
   normalizeInteger
 } from '../lib/game-config';
+import { formatDurationSeconds } from '../lib/game-storage';
 import ScoreboardShell from './ScoreboardShell';
 
 const DRAFT_STORAGE_KEY = 'joker-casino-current-game';
@@ -125,6 +126,23 @@ function getRandomArrayItem(items) {
   return items[getRandomInteger(items.length - 1)];
 }
 
+function getElapsedSeconds(game, nowTimestamp = Date.now()) {
+  if (!game?.startedAt) {
+    return 0;
+  }
+
+  const startedAt = new Date(game.startedAt).getTime();
+
+  if (!Number.isFinite(startedAt)) {
+    return 0;
+  }
+
+  const finishedAt = game.endedAt ? new Date(game.endedAt).getTime() : nowTimestamp;
+  const effectiveEnd = Number.isFinite(finishedAt) ? finishedAt : nowTimestamp;
+
+  return Math.max(0, Math.floor((effectiveEnd - startedAt) / 1000));
+}
+
 function shuffleItems(items) {
   const shuffled = [...items];
 
@@ -179,6 +197,7 @@ export default function GameBoard({ registeredPlayers = [], readOnly = false }) 
   const [savedGames, setSavedGames] = useState([]);
   const [ready, setReady] = useState(false);
   const [flash, setFlash] = useState('');
+  const [timerNow, setTimerNow] = useState(() => Date.now());
 
   useEffect(() => {
     setCurrentGame(readDraft());
@@ -193,6 +212,20 @@ export default function GameBoard({ registeredPlayers = [], readOnly = false }) 
 
     window.localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(currentGame));
   }, [currentGame, ready]);
+
+  useEffect(() => {
+    if (currentGame.status !== 'active') {
+      return undefined;
+    }
+
+    setTimerNow(Date.now());
+
+    const intervalId = window.setInterval(() => {
+      setTimerNow(Date.now());
+    }, 1000);
+
+    return () => window.clearInterval(intervalId);
+  }, [currentGame.status]);
 
   async function loadSavedGames() {
     try {
@@ -227,6 +260,12 @@ export default function GameBoard({ registeredPlayers = [], readOnly = false }) 
     () => getCurrentBlockPremiumContenders(currentGame.rounds, currentRoundId),
     [currentGame.rounds, currentRoundId]
   );
+  const gameDurationSeconds = useMemo(
+    () => getElapsedSeconds(currentGame, timerNow),
+    [currentGame, timerNow]
+  );
+  const tableLocked = readOnly || currentGame.status === 'idle';
+  const canSaveGame = !readOnly && currentGame.status === 'finished';
 
   function updatePlayer(playerKey, value) {
     if (readOnly) {
@@ -283,19 +322,66 @@ export default function GameBoard({ registeredPlayers = [], readOnly = false }) 
       return;
     }
 
-    setCurrentGame((prev) => ({
-      ...prev,
-      rounds: {
-        ...prev.rounds,
-        [roundId]: {
-          ...prev.rounds[roundId],
-          [playerKey]: {
-            ...prev.rounds[roundId][playerKey],
-            [field]: value
+    setCurrentGame((prev) => {
+      if (prev.status === 'idle') {
+        return prev;
+      }
+
+      return {
+        ...prev,
+        rounds: {
+          ...prev.rounds,
+          [roundId]: {
+            ...prev.rounds[roundId],
+            [playerKey]: {
+              ...prev.rounds[roundId][playerKey],
+              [field]: value
+            }
           }
         }
+      };
+    });
+  }
+
+  function startGame() {
+    if (readOnly) {
+      return;
+    }
+
+    setCurrentGame((prev) => {
+      if (prev.status !== 'idle') {
+        return prev;
       }
-    }));
+
+      return {
+        ...prev,
+        status: 'active',
+        startedAt: new Date().toISOString(),
+        endedAt: null
+      };
+    });
+    setTimerNow(Date.now());
+    setFlash('Игра началась. Таблица разблокирована.');
+  }
+
+  function endGame() {
+    if (readOnly) {
+      return;
+    }
+
+    setCurrentGame((prev) => {
+      if (prev.status !== 'active') {
+        return prev;
+      }
+
+      return {
+        ...prev,
+        status: 'finished',
+        endedAt: new Date().toISOString()
+      };
+    });
+    setTimerNow(Date.now());
+    setFlash('Игра завершена. Теперь партию можно сохранить в базу.');
   }
 
   function resetCurrentGame() {
@@ -316,6 +402,11 @@ export default function GameBoard({ registeredPlayers = [], readOnly = false }) 
       return;
     }
 
+    if (currentGame.status === 'idle') {
+      setFlash('Сначала нажми «Начать игру», чтобы открыть таблицу.');
+      return;
+    }
+
     if (!window.confirm('Заполнить таблицу случайными данными? Текущие значения раздач будут заменены.')) {
       return;
     }
@@ -330,6 +421,11 @@ export default function GameBoard({ registeredPlayers = [], readOnly = false }) 
   async function saveGame() {
     if (readOnly) {
       setFlash('Что бы начать играть авторизируйтесь.');
+      return;
+    }
+
+    if (currentGame.status !== 'finished') {
+      setFlash('Сначала закончи игру, чтобы сохранить ее в базу.');
       return;
     }
 
@@ -355,7 +451,8 @@ export default function GameBoard({ registeredPlayers = [], readOnly = false }) 
           title: gameTitle,
           players: currentGame.players,
           totals,
-          rounds: currentGame.rounds
+          rounds: currentGame.rounds,
+          durationSeconds: gameDurationSeconds
         })
       });
 
@@ -452,6 +549,49 @@ export default function GameBoard({ registeredPlayers = [], readOnly = false }) 
               Что бы начать играть авторизируйтесь.
             </div>
           ) : null}
+          <div className="gameSessionPanel">
+            <div className="gameSessionMeta">
+              <div className="gameSessionItem">
+                <span className="gameSessionLabel">Статус игры</span>
+                <strong className={`gameSessionValue gameSessionValueStatus gameStatus${currentGame.status}`}>
+                  {currentGame.status === 'idle'
+                    ? 'Не начата'
+                    : currentGame.status === 'active'
+                      ? 'Идет игра'
+                      : 'Завершена'}
+                </strong>
+              </div>
+              <div className="gameSessionItem">
+                <span className="gameSessionLabel">Время игры</span>
+                <strong className="gameSessionValue gameSessionTimer">
+                  {formatDurationSeconds(gameDurationSeconds)}
+                </strong>
+              </div>
+            </div>
+            <div className="gameSessionActions">
+              <button
+                type="button"
+                className="secondaryButton compactActionButton"
+                onClick={startGame}
+                disabled={readOnly || currentGame.status !== 'idle'}
+              >
+                Начать игру
+              </button>
+              <button
+                type="button"
+                className="secondaryButton compactActionButton"
+                onClick={endGame}
+                disabled={readOnly || currentGame.status !== 'active'}
+              >
+                Закончить игру
+              </button>
+            </div>
+          </div>
+          {!readOnly && currentGame.status === 'idle' ? (
+            <div className="readOnlyNotice">
+              Таблица очков заблокирована, пока игра не начата.
+            </div>
+          ) : null}
           <div className="totalsStack">
             {PLAYER_KEYS.map((playerKey) => (
               <div className="totalRow" key={playerKey}>
@@ -476,11 +616,16 @@ export default function GameBoard({ registeredPlayers = [], readOnly = false }) 
             </div>
           ) : null}
           <div className="buttonRow buttonRowVertical">
-            <button type="button" className="primaryButton" onClick={saveGame} disabled={readOnly}>
+            <button type="button" className="primaryButton" onClick={saveGame} disabled={!canSaveGame}>
               Сохранить партию в базу
             </button>
             <div className="secondaryActionsRow">
-              <button type="button" className="secondaryButton compactActionButton" onClick={fillRandomGame} disabled={readOnly}>
+              <button
+                type="button"
+                className="secondaryButton compactActionButton"
+                onClick={fillRandomGame}
+                disabled={readOnly || currentGame.status === 'idle'}
+              >
                 Заполнить случайно
               </button>
               <button type="button" className="secondaryButton compactActionButton" onClick={resetCurrentGame} disabled={readOnly}>
@@ -492,6 +637,11 @@ export default function GameBoard({ registeredPlayers = [], readOnly = false }) 
       </section>
 
       <section className="tablePanel">
+        {tableLocked && !readOnly ? (
+          <div className="tableLockNotice">
+            Нажми «Начать игру», чтобы разблокировать таблицу и начать отсчет времени.
+          </div>
+        ) : null}
         <div className="scoreTableStickyHeader" aria-hidden="true">
           <div className="scoreTableStickyCell scoreTableStickyMeta">Ход</div>
           {PLAYER_KEYS.map((playerKey) => (
@@ -527,16 +677,16 @@ export default function GameBoard({ registeredPlayers = [], readOnly = false }) 
                     key={round.id}
                     round={round}
                     currentGame={currentGame}
-                  updateRoundValue={updateRoundValue}
-                  readOnly={readOnly}
-                  showBlockSummary={showBlockSummary}
-                  blockSummary={blockSummary}
-                  isCurrentRound={round.id === currentRoundId}
-                />
-              );
-            })}
-          </tbody>
-        </table>
+                    updateRoundValue={updateRoundValue}
+                    readOnly={tableLocked}
+                    showBlockSummary={showBlockSummary}
+                    blockSummary={blockSummary}
+                    isCurrentRound={round.id === currentRoundId}
+                  />
+                );
+              })}
+            </tbody>
+          </table>
         </div>
         <div className="mobileRoundsStack">
           {ROUND_PRESET.map((round, index) => {
@@ -551,7 +701,7 @@ export default function GameBoard({ registeredPlayers = [], readOnly = false }) 
                 round={round}
                 currentGame={currentGame}
                 updateRoundValue={updateRoundValue}
-                readOnly={readOnly}
+                readOnly={tableLocked}
                 showBlockSummary={showBlockSummary}
                 blockSummary={blockSummary}
                 isCurrentRound={round.id === currentRoundId}
