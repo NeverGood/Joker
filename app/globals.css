@@ -48,7 +48,8 @@ select {
 
 .pageShell {
   position: relative;
-  overflow: hidden;
+  overflow-x: clip;
+  overflow-y: visible;
   min-height: 100vh;
   padding: 32px;
 }
@@ -673,13 +674,21 @@ select.textField {
 .historyTableWrap,
 .leaderboardTableWrap {
   max-width: 100%;
-  overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   border-radius: 24px;
   border: 1px solid rgba(242, 238, 229, 0.075);
   background:
     radial-gradient(circle at top left, rgba(216, 175, 104, 0.055), transparent 32%),
     linear-gradient(180deg, rgba(255, 255, 255, 0.028), rgba(255, 255, 255, 0.01));
+}
+
+.scoreboardWrap {
+  overflow: visible;
+}
+
+.historyTableWrap,
+.leaderboardTableWrap {
+  overflow-x: auto;
 }
 
 .mobileRoundsStack {
