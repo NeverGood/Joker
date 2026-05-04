@@ -466,7 +466,6 @@ export default function GameBoard({ registeredPlayers = [], readOnly = false }) 
       <section className="tablePanel">
         <div className="scoreTableStickyHeader" aria-hidden="true">
           <div className="scoreTableStickyCell scoreTableStickyMeta">Ход</div>
-          <div className="scoreTableStickyCell scoreTableStickyMeta">Раздает</div>
           {PLAYER_KEYS.map((playerKey) => (
             <div className="scoreTableStickyCell" key={`sticky-${playerKey}`}>
               <div className="playerColumnHeader">
@@ -482,23 +481,6 @@ export default function GameBoard({ registeredPlayers = [], readOnly = false }) 
 
         <div className="scoreboardWrap">
           <table className="scoreTable enhancedTable simplifiedTable">
-            <thead>
-              <tr>
-                <th>Ход</th>
-                <th>Раздает</th>
-                {PLAYER_KEYS.map((playerKey) => (
-                  <th key={playerKey}>
-                    <div className="playerColumnHeader">
-                      <span>{currentGame.players[playerKey] || DEFAULT_PLAYERS[playerKey]}</span>
-                      <span className="playerColumnSubheads">
-                        <span>Заказ</span>
-                        <span>Взятка</span>
-                      </span>
-                    </div>
-                  </th>
-                ))}
-              </tr>
-            </thead>
             <tbody>
               {ROUND_PRESET.map((round, index) => {
                 const showBlockSummary =
@@ -593,11 +575,6 @@ function RoundRows({ round, currentGame, updateRoundValue, readOnly, showBlockSu
         <td>
           <div className="roundIndexCell">
             <div className={`roundBadge ${isCurrentRound ? 'roundBadgeCurrent' : ''}`}>{round.hand}</div>
-            <span className="roundMetaText">{round.cards} карт</span>
-          </div>
-        </td>
-        <td>
-          <div className="dealerCell">
             <span className="dealerLabel">Раздает</span>
             <span className="dealerPill">{currentGame.players[round.dealerKey] || DEFAULT_PLAYERS[round.dealerKey]}</span>
             {hasInvalidTrickTotal ? (
@@ -628,7 +605,7 @@ function RoundRows({ round, currentGame, updateRoundValue, readOnly, showBlockSu
 
       {showBlockSummary ? (
         <tr className="summaryRow">
-          <td colSpan={2}>
+          <td>
             <div className="summaryLabel">Итого</div>
           </td>
           {PLAYER_KEYS.map((playerKey) => (
@@ -654,9 +631,6 @@ function RoundCard({ round, currentGame, updateRoundValue, readOnly, showBlockSu
       <div className="mobileRoundHeader">
         <div>
           <span className="mobileRoundEyebrow">Ход {round.hand}</span>
-          <strong>{round.cards} карт</strong>
-        </div>
-        <div className="mobileDealerMeta">
           <span className="dealerLabel">Раздает</span>
           <span className="dealerPill">{currentGame.players[round.dealerKey] || DEFAULT_PLAYERS[round.dealerKey]}</span>
         </div>
