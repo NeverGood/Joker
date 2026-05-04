@@ -860,13 +860,15 @@ select.textField {
   border-right: 0;
 }
 
-.blockStartRow td {
-  border-top: 14px solid transparent;
-  background-clip: padding-box;
-}
-
 .scoreTable tbody tr {
   transition: background-color 0.16s ease, transform 0.16s ease;
+}
+
+.blockSpacerRow td {
+  height: 16px;
+  padding: 0;
+  border: 0;
+  background: transparent;
 }
 
 .scoreTable tbody tr:not(.summaryRow):nth-child(even) {

@@ -672,6 +672,8 @@ export default function GameBoard({ registeredPlayers = [], readOnly = false }) 
                   ROUND_PRESET[index + 1].blockId !== round.blockId;
                 const blockSummary = blockTotals.find((block) => block.id === round.blockId);
                 const startsBlock = index === 0 || ROUND_PRESET[index - 1].blockId !== round.blockId;
+                const endsBeforeNextBlock =
+                  showBlockSummary && index !== ROUND_PRESET.length - 1;
 
                 return (
                   <RoundRows
@@ -684,6 +686,7 @@ export default function GameBoard({ registeredPlayers = [], readOnly = false }) 
                     blockSummary={blockSummary}
                     isCurrentRound={round.id === currentRoundId}
                     startsBlock={startsBlock}
+                    endsBeforeNextBlock={endsBeforeNextBlock}
                   />
                 );
               })}
@@ -750,7 +753,17 @@ function ChickenWarningStack({ count }) {
   );
 }
 
-function RoundRows({ round, currentGame, updateRoundValue, readOnly, showBlockSummary, blockSummary, isCurrentRound, startsBlock }) {
+function RoundRows({
+  round,
+  currentGame,
+  updateRoundValue,
+  readOnly,
+  showBlockSummary,
+  blockSummary,
+  isCurrentRound,
+  startsBlock,
+  endsBeforeNextBlock
+}) {
   const roundState = currentGame.rounds[round.id];
   const forbiddenLastBid = getLastBidRestriction(round, roundState);
   const trickTotal = getRoundTrickTotal(roundState);
@@ -801,6 +814,11 @@ function RoundRows({ round, currentGame, updateRoundValue, readOnly, showBlockSu
               <strong>{blockSummary?.runningTotals[playerKey] ?? 0}</strong>
             </td>
           ))}
+        </tr>
+      ) : null}
+      {endsBeforeNextBlock ? (
+        <tr className="blockSpacerRow" aria-hidden="true">
+          <td colSpan={PLAYER_KEYS.length + 1} />
         </tr>
       ) : null}
     </>
