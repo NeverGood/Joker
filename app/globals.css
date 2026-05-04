@@ -1242,6 +1242,18 @@ select.textField {
   white-space: nowrap;
 }
 
+.historyTable .historyTitleColumn {
+  min-width: 220px;
+  max-width: 320px;
+  white-space: normal;
+}
+
+.historyTitleCell {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  line-height: 1.45;
+}
+
 @media (max-width: 1180px) {
   .heroCard,
   .panelGrid {

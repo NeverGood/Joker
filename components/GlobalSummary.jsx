@@ -481,10 +481,10 @@ export default function GlobalSummary() {
           </div>
         ) : (
           <div className="historyTableWrap">
-            <table className="scoreTable compactTable">
+            <table className="scoreTable compactTable historyTable">
               <thead>
                 <tr>
-                  <th>Партия</th>
+                  <th className="historyTitleColumn">Партия</th>
                   <th>Дата</th>
                   <th>Время игры</th>
                   {PLAYER_KEYS.map((playerKey, index) => (
@@ -504,7 +504,7 @@ export default function GlobalSummary() {
                   return (
                     <Fragment key={game.id}>
                       <tr key={game.id}>
-                        <td>{game.title}</td>
+                        <td className="historyTitleColumn historyTitleCell">{game.title}</td>
                         <td>{new Date(game.createdAt).toLocaleString('ru-RU')}</td>
                         <td>{game.durationSeconds > 0 ? formatDurationSeconds(game.durationSeconds) : '—'}</td>
                         {PLAYER_KEYS.map((playerKey) => (
