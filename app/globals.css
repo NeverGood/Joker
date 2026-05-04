@@ -715,10 +715,17 @@ select.textField {
   padding-top: 12px;
   padding-bottom: 11px;
   border-bottom-color: rgba(242, 238, 229, 0.075);
+  position: sticky;
+  top: 0;
+  z-index: 4;
+  background:
+    linear-gradient(180deg, rgba(13, 15, 22, 0.98), rgba(10, 12, 18, 0.96)),
+    radial-gradient(circle at top left, rgba(216, 175, 104, 0.08), transparent 50%);
+  backdrop-filter: blur(16px);
 }
 
 .scoreTable tbody tr {
-  transition: background-color 0.16s ease;
+  transition: background-color 0.16s ease, transform 0.16s ease;
 }
 
 .scoreTable tbody tr:not(.summaryRow):nth-child(even) {
@@ -764,6 +771,28 @@ select.textField {
   background: rgba(255, 255, 255, 0.028);
   color: rgba(241, 205, 140, 0.88);
   font-weight: 700;
+}
+
+.roundIndexCell {
+  display: grid;
+  justify-items: start;
+  gap: 6px;
+}
+
+.roundMetaText {
+  color: rgba(242, 238, 229, 0.42);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.roundBadgeCurrent {
+  background: linear-gradient(135deg, rgba(216, 175, 104, 0.32), rgba(93, 160, 108, 0.18));
+  border: 1px solid rgba(216, 175, 104, 0.42);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.26);
+  color: var(--gold-strong);
 }
 
 .cardsCell {
@@ -1344,6 +1373,43 @@ select.textField {
   gap: 8px;
 }
 
+.currentRoundRow td {
+  background: rgba(255, 255, 255, 0.018);
+  border-bottom-color: rgba(216, 175, 104, 0.08);
+}
+
+.currentRoundRow .roundIndexCell,
+.currentRoundRow .dealerCell,
+.currentRoundRow .roundPlayerCell {
+  transform: translateX(-8px);
+}
+
+.currentRoundRow .dealerCell,
+.currentRoundRow .roundPlayerCell {
+  position: relative;
+  padding: 8px 10px;
+  border: 1px solid rgba(216, 175, 104, 0.16);
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.22);
+}
+
+.currentRoundRow td:first-child {
+  position: relative;
+}
+
+.currentRoundRow td:first-child::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 10px;
+  bottom: 10px;
+  width: 3px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(216, 175, 104, 0.9), rgba(93, 160, 108, 0.82));
+  box-shadow: 0 0 18px rgba(216, 175, 104, 0.3);
+}
+
 .dealerPill,
 .resultTag,
 .scoreBadge {
@@ -1359,6 +1425,14 @@ select.textField {
   background: rgba(216, 175, 104, 0.14);
   border: 1px solid rgba(216, 175, 104, 0.3);
   color: var(--gold-strong);
+}
+
+.dealerLabel {
+  color: rgba(242, 238, 229, 0.34);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
 }
 
 .orderCell span {
@@ -1422,7 +1496,8 @@ select.textField {
 }
 
 .scoreBadgePositive {
-  background: rgba(81, 164, 104, 0.105);
+  background: rgba(81, 164, 104, 0.14);
+  border: 1px solid rgba(122, 217, 148, 0.28);
   color: #b8f5b8;
 }
 
@@ -1447,7 +1522,8 @@ select.textField {
 
 .scoreBadgeNegative,
 .scoreBadgeInvalid {
-  background: rgba(216, 92, 92, 0.11);
+  background: rgba(216, 92, 92, 0.15);
+  border: 1px solid rgba(255, 128, 128, 0.2);
   color: #ffb3aa;
 }
 
@@ -1541,4 +1617,16 @@ select.textField {
   font-size: 0.74rem;
   font-weight: 500;
   letter-spacing: 0.04em;
+}
+
+.mobileDealerMeta {
+  display: grid;
+  justify-items: end;
+  gap: 5px;
+}
+
+.mobileRoundCardCurrent {
+  transform: translateX(-8px);
+  border-color: rgba(216, 175, 104, 0.26);
+  box-shadow: 0 22px 46px rgba(0, 0, 0, 0.28);
 }

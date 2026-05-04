@@ -72,6 +72,27 @@ function getNumberOptions(max) {
   return Array.from({ length: max + 1 }, (_, value) => value);
 }
 
+function isRoundComplete(round, rounds) {
+  const roundState = rounds?.[round.id];
+
+  if (!roundState) {
+    return false;
+  }
+
+  const areBidsFilled = PLAYER_KEYS.every((playerKey) => normalizeInteger(roundState?.[playerKey]?.bid) !== null);
+  const areTricksFilled = isRoundTricksFilled(roundState);
+
+  if (!areBidsFilled || !areTricksFilled) {
+    return false;
+  }
+
+  if (getRoundTrickTotal(roundState) !== round.cards) {
+    return false;
+  }
+
+  return !hasForbiddenLastBid(round, roundState);
+}
+
 function getRandomInteger(max) {
   return Math.floor(Math.random() * (max + 1));
 }
@@ -172,6 +193,10 @@ export default function GameBoard({ registeredPlayers = [], readOnly = false }) 
   );
   const invalidSavableTrickRounds = useMemo(
     () => getInvalidTrickTotalRounds(currentGame.rounds),
+    [currentGame.rounds]
+  );
+  const currentRoundId = useMemo(
+    () => ROUND_PRESET.find((round) => !isRoundComplete(round, currentGame.rounds))?.id ?? ROUND_PRESET[ROUND_PRESET.length - 1]?.id,
     [currentGame.rounds]
   );
 
@@ -470,15 +495,16 @@ export default function GameBoard({ registeredPlayers = [], readOnly = false }) 
                     key={round.id}
                     round={round}
                     currentGame={currentGame}
-                    updateRoundValue={updateRoundValue}
-                    readOnly={readOnly}
-                    showBlockSummary={showBlockSummary}
-                    blockSummary={blockSummary}
-                  />
-                );
-              })}
-            </tbody>
-          </table>
+                  updateRoundValue={updateRoundValue}
+                  readOnly={readOnly}
+                  showBlockSummary={showBlockSummary}
+                  blockSummary={blockSummary}
+                  isCurrentRound={round.id === currentRoundId}
+                />
+              );
+            })}
+          </tbody>
+        </table>
         </div>
         <div className="mobileRoundsStack">
           {ROUND_PRESET.map((round, index) => {
@@ -496,6 +522,7 @@ export default function GameBoard({ registeredPlayers = [], readOnly = false }) 
                 readOnly={readOnly}
                 showBlockSummary={showBlockSummary}
                 blockSummary={blockSummary}
+                isCurrentRound={round.id === currentRoundId}
               />
             );
           })}
@@ -537,7 +564,7 @@ function ChickenWarningStack({ count }) {
   );
 }
 
-function RoundRows({ round, currentGame, updateRoundValue, readOnly, showBlockSummary, blockSummary }) {
+function RoundRows({ round, currentGame, updateRoundValue, readOnly, showBlockSummary, blockSummary, isCurrentRound }) {
   const roundState = currentGame.rounds[round.id];
   const forbiddenLastBid = getLastBidRestriction(round, roundState);
   const trickTotal = getRoundTrickTotal(roundState);
@@ -546,12 +573,16 @@ function RoundRows({ round, currentGame, updateRoundValue, readOnly, showBlockSu
 
   return (
     <>
-      <tr>
+      <tr className={isCurrentRound ? 'currentRoundRow' : ''}>
         <td>
-          <div className="roundBadge">{round.cards}</div>
+          <div className="roundIndexCell">
+            <div className={`roundBadge ${isCurrentRound ? 'roundBadgeCurrent' : ''}`}>{round.hand}</div>
+            <span className="roundMetaText">{round.cards} карт</span>
+          </div>
         </td>
         <td>
           <div className="dealerCell">
+            <span className="dealerLabel">Раздает</span>
             <span className="dealerPill">{currentGame.players[round.dealerKey] || DEFAULT_PLAYERS[round.dealerKey]}</span>
             {hasInvalidTrickTotal ? (
               <span className="rowWarning">Взято {trickTotal} из {round.cards}</span>
@@ -595,7 +626,7 @@ function RoundRows({ round, currentGame, updateRoundValue, readOnly, showBlockSu
   );
 }
 
-function RoundCard({ round, currentGame, updateRoundValue, readOnly, showBlockSummary, blockSummary }) {
+function RoundCard({ round, currentGame, updateRoundValue, readOnly, showBlockSummary, blockSummary, isCurrentRound }) {
   const roundState = currentGame.rounds[round.id];
   const forbiddenLastBid = getLastBidRestriction(round, roundState);
   const trickTotal = getRoundTrickTotal(roundState);
@@ -603,13 +634,16 @@ function RoundCard({ round, currentGame, updateRoundValue, readOnly, showBlockSu
   const hasInvalidTrickTotal = areTricksFilled && trickTotal !== round.cards;
 
   return (
-    <article className="mobileRoundCard">
+    <article className={`mobileRoundCard ${isCurrentRound ? 'mobileRoundCardCurrent' : ''}`}>
       <div className="mobileRoundHeader">
         <div>
-          <span className="mobileRoundEyebrow">Раздача</span>
+          <span className="mobileRoundEyebrow">Ход {round.hand}</span>
           <strong>{round.cards} карт</strong>
         </div>
-        <span className="dealerPill">{currentGame.players[round.dealerKey] || DEFAULT_PLAYERS[round.dealerKey]}</span>
+        <div className="mobileDealerMeta">
+          <span className="dealerLabel">Раздает</span>
+          <span className="dealerPill">{currentGame.players[round.dealerKey] || DEFAULT_PLAYERS[round.dealerKey]}</span>
+        </div>
       </div>
 
       {hasInvalidTrickTotal ? (
@@ -677,6 +711,8 @@ function RoundPlayerFields({
   const isInvalidScore = hasForbiddenBid || hasInvalidTrickTotal;
   const displayScore = isInvalidScore ? '—' : isPremiumScore ? premiumScore : score ?? '—';
   const playerName = currentGame.players[playerKey] || DEFAULT_PLAYERS[playerKey];
+  const bid = normalizeInteger(roundEntry.bid);
+  const tricks = normalizeInteger(roundEntry.tricks);
 
   return (
     <div className={`roundPlayerCell compactRoundPlayerCell ${showPlayerName ? 'mobileRoundPlayerCell' : ''}`}>
@@ -723,40 +759,29 @@ function RoundPlayerFields({
         </label>
       </div>
 
-      <div className={`scoreBadge roundPlayerScore ${getScoreBadgeClass(score, isInvalidScore, {
-        isPremium: isPremiumScore,
-        isCut: isCutScore
-      })}`}>
+      <div className={`scoreBadge roundPlayerScore ${getScoreBadgeClass(isInvalidScore, { isPremium: isPremiumScore, isCut: isCutScore, bid, tricks })}`}>
         {displayScore}
       </div>
     </div>
   );
 }
 
-function getScoreBadgeClass(score, isInvalid, { isPremium = false, isCut = false } = {}) {
+function getScoreBadgeClass(isInvalid, { isPremium = false, isCut = false, bid = null, tricks = null } = {}) {
   if (isInvalid) {
     return 'scoreBadgeInvalid';
   }
 
-  if (isPremium) {
-    return 'scoreBadgePremium';
+  if (bid === null || tricks === null) {
+    return 'scoreBadgeSoft';
   }
 
   if (isCut) {
-    return 'scoreBadgeCut';
-  }
-
-  if (score === null) {
-    return 'scoreBadgeSoft';
-  }
-
-  if (score < 0) {
     return 'scoreBadgeNegative';
   }
 
-  if (score > 0 && score < 100) {
-    return 'scoreBadgeSoft';
+  if (isPremium || tricks === bid) {
+    return 'scoreBadgePositive';
   }
 
-  return 'scoreBadgePositive';
+  return 'scoreBadgeNegative';
 }
