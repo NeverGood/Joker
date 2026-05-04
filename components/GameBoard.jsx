@@ -643,7 +643,7 @@ export default function GameBoard({ registeredPlayers = [], readOnly = false }) 
           </div>
         ) : null}
         <div className="scoreTableStickyHeader" aria-hidden="true">
-          <div className="scoreTableStickyCell scoreTableStickyMeta">Ход</div>
+          <div className="scoreTableStickyCell scoreTableStickyMeta">Карты</div>
           {PLAYER_KEYS.map((playerKey) => (
             <div className="scoreTableStickyCell" key={`sticky-${playerKey}`}>
               <div className="playerColumnHeader">
@@ -671,6 +671,7 @@ export default function GameBoard({ registeredPlayers = [], readOnly = false }) 
                   index === ROUND_PRESET.length - 1 ||
                   ROUND_PRESET[index + 1].blockId !== round.blockId;
                 const blockSummary = blockTotals.find((block) => block.id === round.blockId);
+                const startsBlock = index === 0 || ROUND_PRESET[index - 1].blockId !== round.blockId;
 
                 return (
                   <RoundRows
@@ -682,6 +683,7 @@ export default function GameBoard({ registeredPlayers = [], readOnly = false }) 
                     showBlockSummary={showBlockSummary}
                     blockSummary={blockSummary}
                     isCurrentRound={round.id === currentRoundId}
+                    startsBlock={startsBlock}
                   />
                 );
               })}
@@ -694,6 +696,7 @@ export default function GameBoard({ registeredPlayers = [], readOnly = false }) 
               index === ROUND_PRESET.length - 1 ||
               ROUND_PRESET[index + 1].blockId !== round.blockId;
             const blockSummary = blockTotals.find((block) => block.id === round.blockId);
+            const startsBlock = index === 0 || ROUND_PRESET[index - 1].blockId !== round.blockId;
 
             return (
               <RoundCard
@@ -705,6 +708,7 @@ export default function GameBoard({ registeredPlayers = [], readOnly = false }) 
                 showBlockSummary={showBlockSummary}
                 blockSummary={blockSummary}
                 isCurrentRound={round.id === currentRoundId}
+                startsBlock={startsBlock}
               />
             );
           })}
@@ -746,7 +750,7 @@ function ChickenWarningStack({ count }) {
   );
 }
 
-function RoundRows({ round, currentGame, updateRoundValue, readOnly, showBlockSummary, blockSummary, isCurrentRound }) {
+function RoundRows({ round, currentGame, updateRoundValue, readOnly, showBlockSummary, blockSummary, isCurrentRound, startsBlock }) {
   const roundState = currentGame.rounds[round.id];
   const forbiddenLastBid = getLastBidRestriction(round, roundState);
   const trickTotal = getRoundTrickTotal(roundState);
@@ -755,10 +759,10 @@ function RoundRows({ round, currentGame, updateRoundValue, readOnly, showBlockSu
 
   return (
     <>
-      <tr className={isCurrentRound ? 'currentRoundRow' : ''}>
+      <tr className={`${isCurrentRound ? 'currentRoundRow ' : ''}${startsBlock ? 'blockStartRow' : ''}`.trim()}>
         <td>
           <div className="roundIndexCell">
-            <div className={`roundBadge ${isCurrentRound ? 'roundBadgeCurrent' : ''}`}>{round.hand}</div>
+            <div className={`roundBadge ${isCurrentRound ? 'roundBadgeCurrent' : ''}`}>{round.cards}</div>
             <span className="dealerLabel">Раздает</span>
             <span className="dealerPill">{currentGame.players[round.dealerKey] || DEFAULT_PLAYERS[round.dealerKey]}</span>
             {hasInvalidTrickTotal ? (
@@ -803,7 +807,7 @@ function RoundRows({ round, currentGame, updateRoundValue, readOnly, showBlockSu
   );
 }
 
-function RoundCard({ round, currentGame, updateRoundValue, readOnly, showBlockSummary, blockSummary, isCurrentRound }) {
+function RoundCard({ round, currentGame, updateRoundValue, readOnly, showBlockSummary, blockSummary, isCurrentRound, startsBlock }) {
   const roundState = currentGame.rounds[round.id];
   const forbiddenLastBid = getLastBidRestriction(round, roundState);
   const trickTotal = getRoundTrickTotal(roundState);
@@ -811,10 +815,10 @@ function RoundCard({ round, currentGame, updateRoundValue, readOnly, showBlockSu
   const hasInvalidTrickTotal = areTricksFilled && trickTotal !== round.cards;
 
   return (
-    <article className={`mobileRoundCard ${isCurrentRound ? 'mobileRoundCardCurrent' : ''}`}>
+    <article className={`mobileRoundCard ${isCurrentRound ? 'mobileRoundCardCurrent ' : ''}${startsBlock ? 'mobileBlockStartCard' : ''}`.trim()}>
       <div className="mobileRoundHeader">
         <div>
-          <span className="mobileRoundEyebrow">Ход {round.hand}</span>
+          <span className="mobileRoundEyebrow">{round.cards} карт</span>
           <span className="dealerLabel">Раздает</span>
           <span className="dealerPill">{currentGame.players[round.dealerKey] || DEFAULT_PLAYERS[round.dealerKey]}</span>
         </div>

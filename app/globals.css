@@ -860,6 +860,11 @@ select.textField {
   border-right: 0;
 }
 
+.blockStartRow td {
+  border-top: 14px solid transparent;
+  background-clip: padding-box;
+}
+
 .scoreTable tbody tr {
   transition: background-color 0.16s ease, transform 0.16s ease;
 }
@@ -1493,6 +1498,10 @@ select.textField {
     background:
       radial-gradient(circle at top left, rgba(216, 175, 104, 0.065), transparent 42%),
       rgba(255, 255, 255, 0.018);
+  }
+
+  .mobileBlockStartCard {
+    margin-top: 10px;
   }
 
   .mobileRoundHeader {
