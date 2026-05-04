@@ -1,7 +1,7 @@
 import './globals.css';
 
 export const metadata = {
-  title: 'Joker Casino Scoreboard',
+  title: 'Joker Bus-Angeles Edition',
   description: 'Казино-таблица для ведения счета карточной игры на четверых.'
 };
 
