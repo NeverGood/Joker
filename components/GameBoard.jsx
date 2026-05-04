@@ -93,6 +93,30 @@ function isRoundComplete(round, rounds) {
   return !hasForbiddenLastBid(round, roundState);
 }
 
+function getCurrentBlockPremiumContenders(rounds, currentRoundId) {
+  const currentRound = ROUND_PRESET.find((round) => round.id === currentRoundId) ?? ROUND_PRESET[0];
+  const blockRounds = ROUND_PRESET.filter((round) => round.blockId === currentRound.blockId);
+  const currentRoundIndex = blockRounds.findIndex((round) => round.id === currentRound.id);
+  const playedBlockRounds = blockRounds.slice(0, currentRoundIndex + 1);
+
+  return Object.fromEntries(
+    PLAYER_KEYS.map((playerKey) => [
+      playerKey,
+      playedBlockRounds.every((round) => {
+        const roundEntry = rounds?.[round.id]?.[playerKey];
+        const bid = normalizeInteger(roundEntry?.bid);
+        const tricks = normalizeInteger(roundEntry?.tricks);
+
+        if (bid === null || tricks === null) {
+          return true;
+        }
+
+        return bid === tricks;
+      })
+    ])
+  );
+}
+
 function getRandomInteger(max) {
   return Math.floor(Math.random() * (max + 1));
 }
@@ -198,6 +222,10 @@ export default function GameBoard({ registeredPlayers = [], readOnly = false }) 
   const currentRoundId = useMemo(
     () => ROUND_PRESET.find((round) => !isRoundComplete(round, currentGame.rounds))?.id ?? ROUND_PRESET[ROUND_PRESET.length - 1]?.id,
     [currentGame.rounds]
+  );
+  const premiumContenders = useMemo(
+    () => getCurrentBlockPremiumContenders(currentGame.rounds, currentRoundId),
+    [currentGame.rounds, currentRoundId]
   );
 
   function updatePlayer(playerKey, value) {
@@ -469,7 +497,13 @@ export default function GameBoard({ registeredPlayers = [], readOnly = false }) 
           {PLAYER_KEYS.map((playerKey) => (
             <div className="scoreTableStickyCell" key={`sticky-${playerKey}`}>
               <div className="playerColumnHeader">
-                <span>{currentGame.players[playerKey] || DEFAULT_PLAYERS[playerKey]}</span>
+                <span className="playerHeaderTopline">
+                  <span>{currentGame.players[playerKey] || DEFAULT_PLAYERS[playerKey]}</span>
+                  <span className="playerHeaderTotal">
+                    {totals[playerKey]}
+                    {premiumContenders[playerKey] ? <span className="premiumMarker" aria-label="Претендует на премию" title="Претендует на премию">💰</span> : null}
+                  </span>
+                </span>
                 <span className="playerColumnSubheads">
                   <span>Заказ</span>
                   <span>Взятка</span>
