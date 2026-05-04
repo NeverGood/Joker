@@ -464,6 +464,22 @@ export default function GameBoard({ registeredPlayers = [], readOnly = false }) 
       </section>
 
       <section className="tablePanel">
+        <div className="scoreTableStickyHeader" aria-hidden="true">
+          <div className="scoreTableStickyCell scoreTableStickyMeta">Ход</div>
+          <div className="scoreTableStickyCell scoreTableStickyMeta">Раздает</div>
+          {PLAYER_KEYS.map((playerKey) => (
+            <div className="scoreTableStickyCell" key={`sticky-${playerKey}`}>
+              <div className="playerColumnHeader">
+                <span>{currentGame.players[playerKey] || DEFAULT_PLAYERS[playerKey]}</span>
+                <span className="playerColumnSubheads">
+                  <span>Заказ</span>
+                  <span>Взятка</span>
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+
         <div className="scoreboardWrap">
           <table className="scoreTable enhancedTable simplifiedTable">
             <thead>

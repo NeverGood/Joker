@@ -674,6 +674,7 @@ select.textField {
 .historyTableWrap,
 .leaderboardTableWrap {
   max-width: 100%;
+  overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   border-radius: 24px;
   border: 1px solid rgba(242, 238, 229, 0.075);
@@ -682,13 +683,42 @@ select.textField {
     linear-gradient(180deg, rgba(255, 255, 255, 0.028), rgba(255, 255, 255, 0.01));
 }
 
-.scoreboardWrap {
-  overflow: visible;
+.scoreTableStickyHeader {
+  position: sticky;
+  top: 0;
+  z-index: 12;
+  display: grid;
+  grid-template-columns: 56px 110px repeat(4, minmax(190px, 1fr));
+  align-items: stretch;
+  border: 1px solid rgba(242, 238, 229, 0.075);
+  border-radius: 24px;
+  margin-bottom: 10px;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(13, 15, 22, 0.98), rgba(10, 12, 18, 0.96)),
+    radial-gradient(circle at top left, rgba(216, 175, 104, 0.08), transparent 50%);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
 }
 
-.historyTableWrap,
-.leaderboardTableWrap {
-  overflow-x: auto;
+.scoreTableStickyCell {
+  min-width: 0;
+  padding: 12px;
+  border-right: 1px solid rgba(242, 238, 229, 0.045);
+}
+
+.scoreTableStickyCell:last-child {
+  border-right: 0;
+}
+
+.scoreTableStickyMeta {
+  display: flex;
+  align-items: center;
+  color: rgba(242, 238, 229, 0.58);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
 }
 
 .mobileRoundsStack {
@@ -724,13 +754,6 @@ select.textField {
   padding-top: 12px;
   padding-bottom: 11px;
   border-bottom-color: rgba(242, 238, 229, 0.075);
-  position: sticky;
-  top: 0;
-  z-index: 4;
-  background:
-    linear-gradient(180deg, rgba(13, 15, 22, 0.98), rgba(10, 12, 18, 0.96)),
-    radial-gradient(circle at top left, rgba(216, 175, 104, 0.08), transparent 50%);
-  backdrop-filter: blur(16px);
 }
 
 .scoreTable tbody tr {
@@ -1222,6 +1245,10 @@ select.textField {
   }
 
   .scoreboardWrap {
+    display: none;
+  }
+
+  .scoreTableStickyHeader {
     display: none;
   }
 
