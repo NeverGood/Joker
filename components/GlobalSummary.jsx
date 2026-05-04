@@ -505,7 +505,12 @@ export default function GlobalSummary() {
                     <Fragment key={game.id}>
                       <tr key={game.id}>
                         <td className="historyTitleColumn historyTitleCell">{game.title}</td>
-                        <td>{new Date(game.createdAt).toLocaleString('ru-RU')}</td>
+                        <td>
+                          <div className="historyDateCell">
+                            <span className="historyDateValue">{formatHistoryDate(game.createdAt)}</span>
+                            <span className="historyTimeValue">{formatHistoryTime(game.createdAt)}</span>
+                          </div>
+                        </td>
                         <td>{game.durationSeconds > 0 ? formatDurationSeconds(game.durationSeconds) : '—'}</td>
                         {PLAYER_KEYS.map((playerKey) => (
                           <td key={`${game.id}-${playerKey}`}>
@@ -748,6 +753,14 @@ function formatAverage(value) {
   return new Intl.NumberFormat('ru-RU', {
     maximumFractionDigits: 1
   }).format(value);
+}
+
+function formatHistoryDate(value) {
+  return new Date(value).toLocaleDateString('ru-RU');
+}
+
+function formatHistoryTime(value) {
+  return new Date(value).toLocaleTimeString('ru-RU');
 }
 
 function GameProtocolView({ game }) {

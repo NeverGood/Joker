@@ -1037,6 +1037,24 @@ select.textField {
   min-width: 120px;
 }
 
+.historyDateCell {
+  display: grid;
+  gap: 4px;
+  min-width: 150px;
+}
+
+.historyDateValue {
+  color: var(--text);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.historyTimeValue {
+  color: rgba(242, 238, 229, 0.62);
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
 .inlineToggleButton {
   min-height: 38px;
   padding: 0 14px;
