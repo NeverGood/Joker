@@ -800,10 +800,14 @@ function getScoreBadgeClass(isInvalid, { isPremium = false, isCut = false, bid =
   }
 
   if (isCut) {
-    return 'scoreBadgeNegative';
+    return 'scoreBadgeCut';
   }
 
-  if (isPremium || tricks === bid) {
+  if (isPremium) {
+    return 'scoreBadgePremium';
+  }
+
+  if (tricks === bid) {
     return 'scoreBadgePositive';
   }
 
