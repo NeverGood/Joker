@@ -902,6 +902,7 @@ function RoundPlayerFields({
   const playerName = currentGame.players[playerKey] || DEFAULT_PLAYERS[playerKey];
   const bid = normalizeInteger(roundEntry.bid);
   const tricks = normalizeInteger(roundEntry.tricks);
+  const forcedTrickValue = getForcedTrickValue(round, roundState, playerKey);
 
   return (
     <div className={`roundPlayerCell compactRoundPlayerCell ${showPlayerName ? 'mobileRoundPlayerCell' : ''}`}>
@@ -940,7 +941,11 @@ function RoundPlayerFields({
           >
             <option value="">-</option>
             {getNumberOptions(round.cards).map((value) => (
-              <option key={value} value={value}>
+              <option
+                key={value}
+                value={value}
+                disabled={forcedTrickValue !== null && value !== forcedTrickValue}
+              >
                 {value}
               </option>
             ))}
@@ -977,4 +982,21 @@ function getScoreBadgeClass(isInvalid, { isPremium = false, isCut = false, bid =
   }
 
   return 'scoreBadgeNegative';
+}
+
+function getForcedTrickValue(round, roundState, playerKey) {
+  const otherPlayerKeys = PLAYER_KEYS.filter((key) => key !== playerKey);
+  const otherTricks = otherPlayerKeys.map((key) => normalizeInteger(roundState?.[key]?.tricks));
+
+  if (otherTricks.some((value) => value === null)) {
+    return null;
+  }
+
+  const remainingTricks = round.cards - otherTricks.reduce((sum, value) => sum + value, 0);
+
+  if (remainingTricks < 0 || remainingTricks > round.cards) {
+    return null;
+  }
+
+  return remainingTricks;
 }
