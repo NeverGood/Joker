@@ -751,6 +751,16 @@ select.textField {
   max-width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+}
+
+.scoreboardWrap {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.historyTableWrap,
+.leaderboardTableWrap {
   border-radius: 24px;
   border: 1px solid rgba(242, 238, 229, 0.075);
   background:
