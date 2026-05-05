@@ -850,12 +850,21 @@ select.textField {
 
 .scoreTableBlocks {
   display: grid;
-  gap: 14px;
+  gap: 26px;
+  padding-block: 6px;
 }
 
 .scoreTableBlock {
+  padding: 10px 0;
   overflow: hidden;
-  border-radius: 18px;
+  border-radius: 22px;
+  border: 1px solid rgba(216, 175, 104, 0.12);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.008)),
+    rgba(10, 12, 18, 0.44);
+  box-shadow:
+    0 0 0 1px rgba(242, 238, 229, 0.03) inset,
+    0 18px 34px rgba(0, 0, 0, 0.18);
 }
 
 .scoreTable td {
@@ -1526,10 +1535,16 @@ select.textField {
   .mobileBlockSection {
     display: grid;
     gap: 12px;
+    padding: 10px 0;
+    border: 1px solid rgba(216, 175, 104, 0.12);
+    border-radius: 20px;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.008)),
+      rgba(10, 12, 18, 0.44);
   }
 
   .mobileBlockSection + .mobileBlockSection {
-    margin-top: 12px;
+    margin-top: 18px;
   }
 
   .mobileRoundHeader {
