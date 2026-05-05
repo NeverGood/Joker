@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import {
+  GAME_BLOCKS,
   PLAYER_KEYS,
   ROUND_PRESET,
   calculateBlockTotals,
@@ -664,55 +665,54 @@ export default function GameBoard({ registeredPlayers = [], readOnly = false }) 
         </div>
 
         <div className="scoreboardWrap">
-          <table className="scoreTable enhancedTable simplifiedTable">
-            <tbody>
-              {ROUND_PRESET.map((round, index) => {
-                const showBlockSummary =
-                  index === ROUND_PRESET.length - 1 ||
-                  ROUND_PRESET[index + 1].blockId !== round.blockId;
-                const blockSummary = blockTotals.find((block) => block.id === round.blockId);
-                const startsBlock = index === 0 || ROUND_PRESET[index - 1].blockId !== round.blockId;
-                const endsBeforeNextBlock =
-                  showBlockSummary && index !== ROUND_PRESET.length - 1;
+          <div className="scoreTableBlocks">
+            {GAME_BLOCKS.map((block) => {
+              const blockRounds = ROUND_PRESET.filter((round) => round.blockId === block.id);
+              const blockSummary = blockTotals.find((item) => item.id === block.id);
 
-                return (
-                  <RoundRows
-                    key={round.id}
+              return (
+                <div className="scoreTableBlock" key={block.id}>
+                  <table className="scoreTable enhancedTable simplifiedTable">
+                    <tbody>
+                      {blockRounds.map((round, index) => (
+                        <RoundRows
+                          key={round.id}
+                          round={round}
+                          currentGame={currentGame}
+                          updateRoundValue={updateRoundValue}
+                          readOnly={tableLocked}
+                          showBlockSummary={index === blockRounds.length - 1}
+                          blockSummary={blockSummary}
+                          isCurrentRound={round.id === currentRoundId}
+                        />
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        <div className="mobileRoundsStack">
+          {GAME_BLOCKS.map((block) => {
+            const blockRounds = ROUND_PRESET.filter((round) => round.blockId === block.id);
+            const blockSummary = blockTotals.find((item) => item.id === block.id);
+
+            return (
+              <div className="mobileBlockSection" key={`mobile-${block.id}`}>
+                {blockRounds.map((round, index) => (
+                  <RoundCard
+                    key={`mobile-${round.id}`}
                     round={round}
                     currentGame={currentGame}
                     updateRoundValue={updateRoundValue}
                     readOnly={tableLocked}
-                    showBlockSummary={showBlockSummary}
+                    showBlockSummary={index === blockRounds.length - 1}
                     blockSummary={blockSummary}
                     isCurrentRound={round.id === currentRoundId}
-                    startsBlock={startsBlock}
-                    endsBeforeNextBlock={endsBeforeNextBlock}
                   />
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-        <div className="mobileRoundsStack">
-          {ROUND_PRESET.map((round, index) => {
-            const showBlockSummary =
-              index === ROUND_PRESET.length - 1 ||
-              ROUND_PRESET[index + 1].blockId !== round.blockId;
-            const blockSummary = blockTotals.find((block) => block.id === round.blockId);
-            const startsBlock = index === 0 || ROUND_PRESET[index - 1].blockId !== round.blockId;
-
-            return (
-              <RoundCard
-                key={`mobile-${round.id}`}
-                round={round}
-                currentGame={currentGame}
-                updateRoundValue={updateRoundValue}
-                readOnly={tableLocked}
-                showBlockSummary={showBlockSummary}
-                blockSummary={blockSummary}
-                isCurrentRound={round.id === currentRoundId}
-                startsBlock={startsBlock}
-              />
+                ))}
+              </div>
             );
           })}
         </div>
@@ -760,9 +760,7 @@ function RoundRows({
   readOnly,
   showBlockSummary,
   blockSummary,
-  isCurrentRound,
-  startsBlock,
-  endsBeforeNextBlock
+  isCurrentRound
 }) {
   const roundState = currentGame.rounds[round.id];
   const forbiddenLastBid = getLastBidRestriction(round, roundState);
@@ -772,7 +770,7 @@ function RoundRows({
 
   return (
     <>
-      <tr className={`${isCurrentRound ? 'currentRoundRow ' : ''}${startsBlock ? 'blockStartRow' : ''}`.trim()}>
+      <tr className={isCurrentRound ? 'currentRoundRow' : ''}>
         <td>
           <div className="roundIndexCell">
             <div className={`roundBadge ${isCurrentRound ? 'roundBadgeCurrent' : ''}`}>{round.cards}</div>
@@ -816,18 +814,11 @@ function RoundRows({
           ))}
         </tr>
       ) : null}
-      {endsBeforeNextBlock ? (
-        <tr className="blockSpacerRow" aria-hidden="true">
-          <td colSpan={PLAYER_KEYS.length + 1}>
-            <div className="blockSpacer" />
-          </td>
-        </tr>
-      ) : null}
     </>
   );
 }
 
-function RoundCard({ round, currentGame, updateRoundValue, readOnly, showBlockSummary, blockSummary, isCurrentRound, startsBlock }) {
+function RoundCard({ round, currentGame, updateRoundValue, readOnly, showBlockSummary, blockSummary, isCurrentRound }) {
   const roundState = currentGame.rounds[round.id];
   const forbiddenLastBid = getLastBidRestriction(round, roundState);
   const trickTotal = getRoundTrickTotal(roundState);
@@ -835,7 +826,7 @@ function RoundCard({ round, currentGame, updateRoundValue, readOnly, showBlockSu
   const hasInvalidTrickTotal = areTricksFilled && trickTotal !== round.cards;
 
   return (
-    <article className={`mobileRoundCard ${isCurrentRound ? 'mobileRoundCardCurrent ' : ''}${startsBlock ? 'mobileBlockStartCard' : ''}`.trim()}>
+    <article className={isCurrentRound ? 'mobileRoundCard mobileRoundCardCurrent' : 'mobileRoundCard'}>
       <div className="mobileRoundHeader">
         <div>
           <span className="mobileRoundEyebrow">{round.cards} карт</span>

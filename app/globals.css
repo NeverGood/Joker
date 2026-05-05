@@ -848,6 +848,16 @@ select.textField {
   border-spacing: 0;
 }
 
+.scoreTableBlocks {
+  display: grid;
+  gap: 14px;
+}
+
+.scoreTableBlock {
+  overflow: hidden;
+  border-radius: 18px;
+}
+
 .scoreTable td {
   padding: 10px 12px;
   border-bottom: 1px solid rgba(242, 238, 229, 0.045);
@@ -862,18 +872,6 @@ select.textField {
 
 .scoreTable tbody tr {
   transition: background-color 0.16s ease, transform 0.16s ease;
-}
-
-.blockSpacerRow td {
-  padding: 0;
-  border: 0;
-  background: transparent;
-}
-
-.blockSpacer {
-  display: block;
-  height: 18px;
-  width: 100%;
 }
 
 .scoreTable tbody tr:not(.summaryRow):nth-child(even) {
@@ -1525,8 +1523,13 @@ select.textField {
       rgba(255, 255, 255, 0.018);
   }
 
-  .mobileBlockStartCard {
-    margin-top: 10px;
+  .mobileBlockSection {
+    display: grid;
+    gap: 12px;
+  }
+
+  .mobileBlockSection + .mobileBlockSection {
+    margin-top: 12px;
   }
 
   .mobileRoundHeader {
