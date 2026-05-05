@@ -818,7 +818,9 @@ function RoundRows({
       ) : null}
       {endsBeforeNextBlock ? (
         <tr className="blockSpacerRow" aria-hidden="true">
-          <td colSpan={PLAYER_KEYS.length + 1} />
+          <td colSpan={PLAYER_KEYS.length + 1}>
+            <div className="blockSpacer" />
+          </td>
         </tr>
       ) : null}
     </>

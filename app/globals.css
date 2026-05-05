@@ -865,10 +865,15 @@ select.textField {
 }
 
 .blockSpacerRow td {
-  height: 16px;
   padding: 0;
   border: 0;
   background: transparent;
+}
+
+.blockSpacer {
+  display: block;
+  height: 18px;
+  width: 100%;
 }
 
 .scoreTable tbody tr:not(.summaryRow):nth-child(even) {
