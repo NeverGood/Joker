@@ -21,6 +21,7 @@ import { formatDurationSeconds } from '../lib/game-storage';
 import ScoreboardShell from './ScoreboardShell';
 
 const DRAFT_STORAGE_KEY = 'joker-casino-current-game';
+const PENALTY_POINTS = 250;
 
 const playerAccent = {
   player1: 'playerAccentOne',
@@ -48,6 +49,7 @@ function readDraft() {
       ...parsed,
       players: { ...DEFAULT_PLAYERS, ...(parsed.players || {}) },
       warnings: normalizeWarnings(parsed.warnings, emptyGame.warnings),
+      penalties: normalizePenalties(parsed.penalties, emptyGame.penalties),
       rounds: { ...emptyGame.rounds, ...(parsed.rounds || {}) }
     };
   } catch {
@@ -66,6 +68,26 @@ function normalizeWarnings(savedWarnings, fallbackWarnings) {
 
     const parsed = Number.parseInt(String(value ?? fallbackWarnings[playerKey] ?? 0), 10);
     acc[playerKey] = Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
+    return acc;
+  }, {});
+}
+
+function normalizePenalties(savedPenalties, fallbackPenalties) {
+  return PLAYER_KEYS.reduce((acc, playerKey) => {
+    const parsed = Number.parseInt(String(savedPenalties?.[playerKey] ?? fallbackPenalties[playerKey] ?? 0), 10);
+    acc[playerKey] = Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
+    return acc;
+  }, {});
+}
+
+function getPenaltyPoints(penalties, playerKey) {
+  const penaltyCount = Number.parseInt(String(penalties?.[playerKey] ?? 0), 10);
+  return Number.isFinite(penaltyCount) && penaltyCount > 0 ? penaltyCount * PENALTY_POINTS : 0;
+}
+
+function applyPlayerPenalties(totals, penalties) {
+  return PLAYER_KEYS.reduce((acc, playerKey) => {
+    acc[playerKey] = (totals?.[playerKey] ?? 0) - getPenaltyPoints(penalties, playerKey);
     return acc;
   }, {});
 }
@@ -239,7 +261,11 @@ export default function GameBoard({ registeredPlayers = [], readOnly = false }) 
     }
   }
 
-  const totals = useMemo(() => calculateTotals(currentGame.rounds), [currentGame.rounds]);
+  const baseTotals = useMemo(() => calculateTotals(currentGame.rounds), [currentGame.rounds]);
+  const totals = useMemo(
+    () => applyPlayerPenalties(baseTotals, currentGame.penalties),
+    [baseTotals, currentGame.penalties]
+  );
   const blockTotals = useMemo(() => calculateBlockTotals(currentGame.rounds), [currentGame.rounds]);
   const invalidLastBidRounds = useMemo(
     () => ROUND_PRESET.filter((round) => hasForbiddenLastBid(round, currentGame.rounds[round.id])),
@@ -314,6 +340,34 @@ export default function GameBoard({ registeredPlayers = [], readOnly = false }) 
       warnings: {
         ...prev.warnings,
         [playerKey]: Math.max(0, (prev.warnings?.[playerKey] || 0) - 1)
+      }
+    }));
+  }
+
+  function addPlayerPenalty(playerKey) {
+    if (readOnly) {
+      return;
+    }
+
+    setCurrentGame((prev) => ({
+      ...prev,
+      penalties: {
+        ...prev.penalties,
+        [playerKey]: (prev.penalties?.[playerKey] || 0) + 1
+      }
+    }));
+  }
+
+  function removePlayerPenalty(playerKey) {
+    if (readOnly) {
+      return;
+    }
+
+    setCurrentGame((prev) => ({
+      ...prev,
+      penalties: {
+        ...prev.penalties,
+        [playerKey]: Math.max(0, (prev.penalties?.[playerKey] || 0) - 1)
       }
     }));
   }
@@ -508,24 +562,49 @@ export default function GameBoard({ registeredPlayers = [], readOnly = false }) 
                     </option>
                   ))}
                 </select>
-                <button
-                  type="button"
-                  className={`warningActionButton ${currentGame.warnings?.[playerKey] > 0 ? 'warningActionButtonActive' : ''}`}
-                  onClick={() => addPlayerWarning(playerKey)}
-                  disabled={readOnly}
-                >
-                  <ChickenHeadIcon />
-                  <span>Вынести предупреждение</span>
-                </button>
-                {currentGame.warnings?.[playerKey] > 0 ? (
+                <div className="playerActionRow">
                   <button
                     type="button"
-                    className="warningUndoButton"
-                    onClick={() => removePlayerWarning(playerKey)}
+                    className={`warningActionButton ${currentGame.warnings?.[playerKey] > 0 ? 'warningActionButtonActive' : ''}`}
+                    onClick={() => addPlayerWarning(playerKey)}
                     disabled={readOnly}
                   >
-                    Снять одно предупреждение
+                    <ChickenHeadIcon />
+                    <span>Вынести предупреждение</span>
                   </button>
+                  <button
+                    type="button"
+                    className={`penaltyActionButton ${currentGame.penalties?.[playerKey] > 0 ? 'penaltyActionButtonActive' : ''}`}
+                    onClick={() => addPlayerPenalty(playerKey)}
+                    disabled={readOnly}
+                  >
+                    <span className="penaltyButtonMark">-250</span>
+                    <span>Штраф</span>
+                  </button>
+                </div>
+                {currentGame.warnings?.[playerKey] > 0 || currentGame.penalties?.[playerKey] > 0 ? (
+                  <div className="playerUndoActions">
+                    {currentGame.warnings?.[playerKey] > 0 ? (
+                      <button
+                        type="button"
+                        className="warningUndoButton"
+                        onClick={() => removePlayerWarning(playerKey)}
+                        disabled={readOnly}
+                      >
+                        Снять одно предупреждение
+                      </button>
+                    ) : null}
+                    {currentGame.penalties?.[playerKey] > 0 ? (
+                      <button
+                        type="button"
+                        className="penaltyUndoButton"
+                        onClick={() => removePlayerPenalty(playerKey)}
+                        disabled={readOnly}
+                      >
+                        Снять один штраф
+                      </button>
+                    ) : null}
+                  </div>
                 ) : null}
               </div>
             ))}
@@ -594,17 +673,26 @@ export default function GameBoard({ registeredPlayers = [], readOnly = false }) 
             </div>
           ) : null}
           <div className="totalsStack">
-            {PLAYER_KEYS.map((playerKey) => (
-              <div className="totalRow" key={playerKey}>
-                <span className="totalPlayerName">
-                  {currentGame.players[playerKey] || DEFAULT_PLAYERS[playerKey]}
-                  {currentGame.warnings?.[playerKey] > 0 ? (
-                    <ChickenWarningStack count={currentGame.warnings[playerKey]} />
-                  ) : null}
-                </span>
-                <strong>{totals[playerKey]}</strong>
-              </div>
-            ))}
+            {PLAYER_KEYS.map((playerKey) => {
+              const penaltyPoints = getPenaltyPoints(currentGame.penalties, playerKey);
+
+              return (
+                <div className="totalRow" key={playerKey}>
+                  <span className="totalPlayerName">
+                    {currentGame.players[playerKey] || DEFAULT_PLAYERS[playerKey]}
+                    {currentGame.warnings?.[playerKey] > 0 ? (
+                      <ChickenWarningStack count={currentGame.warnings[playerKey]} />
+                    ) : null}
+                    {penaltyPoints > 0 ? (
+                      <span className="playerPenaltyTag" title={`Штрафов: ${currentGame.penalties[playerKey]}`}>
+                        -{penaltyPoints}
+                      </span>
+                    ) : null}
+                  </span>
+                  <strong>{totals[playerKey]}</strong>
+                </div>
+              );
+            })}
           </div>
           {invalidLastBidRounds.length > 0 ? (
             <div className="warningBox">

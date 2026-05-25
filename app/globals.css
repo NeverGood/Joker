@@ -281,7 +281,16 @@ select {
 .playerAccentThree { box-shadow: inset 0 0 0 1px rgba(173, 255, 193, 0.16); }
 .playerAccentFour { box-shadow: inset 0 0 0 1px rgba(249, 145, 145, 0.16); }
 
-.warningActionButton {
+.playerActionRow,
+.playerUndoActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.warningActionButton,
+.penaltyActionButton {
   display: inline-flex;
   width: fit-content;
   min-height: 32px;
@@ -299,6 +308,10 @@ select {
   transition: border-color 0.16s ease, background-color 0.16s ease, color 0.16s ease, transform 0.16s ease;
 }
 
+.penaltyActionButton {
+  color: rgba(255, 190, 182, 0.78);
+}
+
 .warningActionButton:hover,
 .warningActionButtonActive {
   border-color: rgba(241, 205, 140, 0.45);
@@ -306,18 +319,42 @@ select {
   color: var(--gold-strong);
 }
 
-.warningActionButton:hover {
+.penaltyActionButton:hover,
+.penaltyActionButtonActive {
+  border-color: rgba(239, 98, 98, 0.42);
+  background: rgba(239, 98, 98, 0.12);
+  color: #ffb3aa;
+}
+
+.warningActionButton:hover,
+.penaltyActionButton:hover {
   transform: translateY(-1px);
 }
 
 .warningActionButton:disabled,
-.warningUndoButton:disabled {
+.penaltyActionButton:disabled,
+.warningUndoButton:disabled,
+.penaltyUndoButton:disabled {
   cursor: not-allowed;
   opacity: 0.48;
   transform: none;
 }
 
-.warningUndoButton {
+.penaltyButtonMark {
+  display: inline-flex;
+  min-width: 36px;
+  height: 20px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: rgba(239, 98, 98, 0.16);
+  color: #ffd1cc;
+  font-size: 0.68rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.warningUndoButton,
+.penaltyUndoButton {
   width: fit-content;
   border: 0;
   background: transparent;
@@ -331,7 +368,8 @@ select {
   text-underline-offset: 4px;
 }
 
-.warningUndoButton:hover {
+.warningUndoButton:hover,
+.penaltyUndoButton:hover {
   color: #ffb3aa;
 }
 
@@ -584,7 +622,22 @@ select.textField {
 .totalPlayerName {
   display: inline-flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 8px;
+}
+
+.playerPenaltyTag {
+  display: inline-flex;
+  min-height: 24px;
+  align-items: center;
+  padding: 0 8px;
+  border: 1px solid rgba(239, 98, 98, 0.28);
+  border-radius: 999px;
+  background: rgba(239, 98, 98, 0.1);
+  color: #ffb3aa;
+  font-size: 0.72rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
 }
 
 .tableLockNotice {
@@ -1478,13 +1531,21 @@ select.textField {
       var(--field);
   }
 
-  .warningActionButton {
+  .playerActionRow,
+  .playerUndoActions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .warningActionButton,
+  .penaltyActionButton {
     width: 100%;
     justify-content: center;
     min-height: 40px;
   }
 
-  .warningUndoButton {
+  .warningUndoButton,
+  .penaltyUndoButton {
     width: 100%;
     text-align: center;
   }
