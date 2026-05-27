@@ -259,6 +259,322 @@ select {
   font-size: 0.92rem;
 }
 
+.reglamentHero {
+  margin-bottom: 24px;
+}
+
+.reglamentRulesPanel {
+  margin-bottom: 24px;
+}
+
+.reglamentRulesSummary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  cursor: pointer;
+  color: var(--text);
+  font-size: 1.65rem;
+  font-weight: 800;
+  line-height: 1.1;
+  list-style: none;
+}
+
+.reglamentRulesSummary::-webkit-details-marker {
+  display: none;
+}
+
+.reglamentRulesSummary::after {
+  display: inline-flex;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(242, 238, 229, 0.16);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.035);
+  color: var(--gold-strong);
+  content: '+';
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.reglamentRulesPanel[open] .reglamentRulesSummary::after {
+  content: '-';
+}
+
+.reglamentGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 22px;
+}
+
+.reglamentBlock,
+.reglamentExampleCard {
+  border: 1px solid rgba(242, 238, 229, 0.12);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.reglamentBlock {
+  min-width: 0;
+  padding: 24px;
+  border-radius: 24px;
+}
+
+.reglamentBlock h2 {
+  margin: 0;
+  color: var(--text);
+  font-size: 1.45rem;
+  line-height: 1.15;
+}
+
+.reglamentBlock p:not(.sectionEyebrow) {
+  margin: 14px 0 0;
+  color: #cfc7ba;
+  line-height: 1.65;
+}
+
+.reglamentBlock ul {
+  display: grid;
+  gap: 10px;
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.reglamentBlock li {
+  position: relative;
+  padding-left: 20px;
+  color: rgba(242, 238, 229, 0.82);
+  line-height: 1.55;
+}
+
+.reglamentBlock li::before {
+  position: absolute;
+  top: 0.66em;
+  left: 0;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--gold);
+  content: '';
+}
+
+.reglamentExamples {
+  margin-top: 24px;
+}
+
+.reglamentExamplesGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.reglamentExampleCard {
+  display: grid;
+  gap: 12px;
+  min-height: 120px;
+  align-content: space-between;
+  padding: 18px;
+  border-radius: 20px;
+}
+
+.reglamentExampleCard span {
+  color: rgba(242, 238, 229, 0.72);
+  line-height: 1.45;
+}
+
+.reglamentExampleCard strong {
+  color: var(--gold-strong);
+  font-size: 1.9rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.reglamentTextBlock {
+  display: grid;
+  gap: 18px;
+  margin-top: 22px;
+}
+
+.reglamentTextBlock p {
+  margin: 0;
+  color: #cfc7ba;
+  line-height: 1.7;
+}
+
+.reglamentPunishmentBody {
+  gap: 20px;
+}
+
+.reglamentPunishmentIntro {
+  padding: 20px 22px;
+  border: 1px solid rgba(216, 175, 104, 0.2);
+  border-radius: 22px;
+  background:
+    linear-gradient(135deg, rgba(216, 175, 104, 0.12), transparent 55%),
+    rgba(255, 255, 255, 0.025);
+}
+
+.reglamentPunishmentTypes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.reglamentPunishmentType {
+  position: relative;
+  overflow: hidden;
+  min-width: 0;
+  padding: 22px;
+  border: 1px solid rgba(242, 238, 229, 0.12);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.reglamentPunishmentType::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: var(--gold);
+  content: '';
+}
+
+.reglamentPunishmentType-fine::before {
+  background: #df7a68;
+}
+
+.reglamentPunishmentType-point::before {
+  background: #6fc29a;
+}
+
+.reglamentPunishmentTypeHeader {
+  display: flex;
+  align-items: flex-start;
+}
+
+.reglamentPunishmentType h2,
+.reglamentPunishmentCasesHeader h2 {
+  margin: 0;
+  color: var(--text);
+  font-size: 1.26rem;
+  line-height: 1.15;
+}
+
+.reglamentPunishmentAccent {
+  display: inline-block;
+  margin-top: 6px;
+  color: var(--gold-strong);
+  font-size: 1.5rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.reglamentPunishmentType p {
+  margin-top: 12px;
+}
+
+.reglamentPunishmentCasesHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 4px;
+}
+
+.reglamentPunishmentCasesHeader .sectionEyebrow {
+  margin: 0;
+}
+
+.reglamentPunishmentList {
+  display: grid;
+  gap: 10px;
+  counter-reset: punishment;
+  margin: 4px 0 0;
+  padding: 0;
+  color: rgba(242, 238, 229, 0.84);
+  list-style: none;
+}
+
+.reglamentPunishmentList li {
+  counter-increment: punishment;
+}
+
+.reglamentPunishmentRule {
+  position: relative;
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  padding: 18px 18px 18px 64px;
+  border: 1px solid rgba(242, 238, 229, 0.1);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.reglamentPunishmentRule::before {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  display: inline-flex;
+  width: 30px;
+  height: 30px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(216, 175, 104, 0.24);
+  border-radius: 999px;
+  background: rgba(216, 175, 104, 0.1);
+  color: var(--gold-strong);
+  content: counter(punishment);
+  font-weight: 800;
+  line-height: 1;
+}
+
+.reglamentPunishmentRuleTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.reglamentPunishmentRuleTop strong {
+  color: var(--text);
+  font-size: 1.06rem;
+  line-height: 1.6;
+}
+
+.reglamentPunishmentRule p {
+  color: rgba(242, 238, 229, 0.76);
+}
+
+.reglamentPunishmentChip {
+  display: inline-flex;
+  min-width: max-content;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 11px;
+  border: 1px solid rgba(216, 175, 104, 0.28);
+  border-radius: 999px;
+  background: rgba(216, 175, 104, 0.1);
+  color: var(--gold-strong);
+  font-size: 0.78rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.reglamentPunishmentChip-fine {
+  border-color: rgba(223, 122, 104, 0.32);
+  background: rgba(223, 122, 104, 0.12);
+  color: #f0ad9d;
+}
+
+.reglamentPunishmentChip-point {
+  border-color: rgba(111, 194, 154, 0.32);
+  background: rgba(111, 194, 154, 0.12);
+  color: #9de5bd;
+}
+
 .playersGrid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 20px 22px;
@@ -1478,6 +1794,77 @@ select.textField {
 
   .leaderboardPanel {
     padding: 16px;
+  }
+
+  .reglamentHero {
+    margin-bottom: 12px;
+  }
+
+  .reglamentRulesPanel {
+    margin-bottom: 12px;
+  }
+
+  .reglamentRulesSummary {
+    font-size: 1.45rem;
+  }
+
+  .reglamentRulesSummary::after {
+    width: 30px;
+    height: 30px;
+  }
+
+  .reglamentGrid,
+  .reglamentExamplesGrid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .reglamentGrid {
+    margin-top: 16px;
+  }
+
+  .reglamentBlock {
+    padding: 16px;
+    border-radius: 18px;
+  }
+
+  .reglamentBlock h2 {
+    font-size: 1.24rem;
+  }
+
+  .reglamentExampleCard {
+    min-height: 0;
+    padding: 16px;
+    border-radius: 18px;
+  }
+
+  .reglamentPunishmentTypes {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .reglamentPunishmentIntro,
+  .reglamentPunishmentType {
+    padding: 16px;
+    border-radius: 18px;
+  }
+
+  .reglamentPunishmentCasesHeader,
+  .reglamentPunishmentRuleTop {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .reglamentPunishmentRule {
+    padding: 16px 16px 16px 56px;
+    border-radius: 16px;
+  }
+
+  .reglamentPunishmentRule::before {
+    top: 16px;
+    left: 16px;
+    width: 26px;
+    height: 26px;
   }
 
   .panelHeader {

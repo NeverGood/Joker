@@ -24,6 +24,12 @@ export default function ScoreboardShell({
             >
               Общий счет
             </Link>
+            <Link
+              href="/reglament"
+              className={active === 'reglament' ? 'navLink navLinkActive' : 'navLink'}
+            >
+              Регламент
+            </Link>
             <AuthNav />
           </nav>
         </header>
