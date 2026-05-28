@@ -16,5 +16,5 @@ export default async function HomePage() {
       })
     : [];
 
-  return <GameBoard registeredPlayers={users} readOnly={!user} isAdmin={Boolean(user?.isAdmin)} />;
+  return <GameBoard registeredPlayers={users} readOnly={!user} />;
 }
