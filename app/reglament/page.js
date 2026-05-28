@@ -3,14 +3,14 @@ import ScoreboardShell from '../../components/ScoreboardShell';
 const ruleBlocks = [
   {
     eyebrow: 'Раздачи',
-    title: 'Порядок партии',
     lead: 'Партия рассчитана на четырех игроков и состоит из 24 раздач.',
     items: [
-      'Разгон: 1, 2, 3, 4, 5, 6, 7, 8 карт.',
-      'Первый блок девяток: четыре раздачи по 9 карт.',
-      'Спуск: 8, 7, 6, 5, 4, 3, 2, 1 карт.',
-      'Финальный блок девяток: четыре раздачи по 9 карт.'
-    ]
+      'Первый блок: 1, 2, 3, 4, 5, 6, 7, 8 карт.',
+      'Второй блок: четыре раздачи по 9 карт.',
+      'Третий блок: 8, 7, 6, 5, 4, 3, 2, 1 карт.',
+      'Последний блок: четыре раздачи по 9 карт.'
+    ],
+    note: 'При раздаче по 9 карт козырь заказывается игроком, который первый заказывает взятку, из первых трех сданных ему карт.'
   },
   {
     eyebrow: 'Очередность',
@@ -164,15 +164,16 @@ export default function ReglamentPage() {
         </summary>
         <div className="reglamentGrid" aria-label="Правила игры">
           {ruleBlocks.map((block) => (
-            <article className="reglamentBlock" key={block.title}>
+            <article className="reglamentBlock" key={block.title || block.eyebrow}>
               <p className="sectionEyebrow">{block.eyebrow}</p>
-              <h2>{block.title}</h2>
+              {block.title ? <h2>{block.title}</h2> : null}
               <p>{block.lead}</p>
               <ul>
                 {block.items.map((item) => (
                   <li key={item}>{item}</li>
                 ))}
               </ul>
+              {block.note ? <p>{block.note}</p> : null}
             </article>
           ))}
         </div>
