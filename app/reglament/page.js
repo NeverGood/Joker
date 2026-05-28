@@ -196,7 +196,7 @@ export default function ReglamentPage() {
         <summary className="reglamentRulesSummary">
           <span>История</span>
         </summary>
-        <div className="reglamentTextBlock reglamentHistoryBlock">
+        <div className="reglamentTextBlock">
           {historyParagraphs.map((paragraph) => (
             <p key={paragraph}>{paragraph}</p>
           ))}
