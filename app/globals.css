@@ -264,7 +264,30 @@ select {
 }
 
 .reglamentHero {
-  margin-bottom: 24px;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  min-height: clamp(120px, 13vw, 210px);
+  margin: 0 0 30px;
+  padding: clamp(26px, 4vw, 64px) clamp(4px, 1.4vw, 22px) clamp(18px, 2.4vw, 34px);
+  border-bottom: 1px solid rgba(216, 175, 104, 0.26);
+}
+
+.reglamentHero::before {
+  position: absolute;
+  left: clamp(4px, 1.4vw, 22px);
+  bottom: 0;
+  width: clamp(80px, 10vw, 160px);
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--gold-strong), rgba(216, 175, 104, 0));
+  content: '';
+}
+
+.reglamentHero .sectionTitle {
+  font-size: clamp(3.6rem, 8vw, 8.5rem);
+  line-height: 0.86;
+  text-shadow: 0 18px 44px rgba(0, 0, 0, 0.42);
 }
 
 .reglamentRulesPanel {
@@ -1955,7 +1978,13 @@ select.textField {
   }
 
   .reglamentHero {
-    margin-bottom: 12px;
+    min-height: auto;
+    margin-bottom: 14px;
+    padding: 22px 4px 18px;
+  }
+
+  .reglamentHero .sectionTitle {
+    font-size: clamp(2.7rem, 14vw, 4.2rem);
   }
 
   .reglamentRulesPanel {

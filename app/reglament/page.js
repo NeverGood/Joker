@@ -188,7 +188,7 @@ export const metadata = {
 export default function ReglamentPage() {
   return (
     <ScoreboardShell active="reglament" frameClassName="reglamentFrame">
-      <section className="reglamentHero panelCard panelCardWide">
+      <section className="reglamentHero">
         <h1 className="sectionTitle">Регламент</h1>
       </section>
 
