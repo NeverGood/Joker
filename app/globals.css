@@ -280,6 +280,11 @@ select {
   list-style: none;
 }
 
+.reglamentRulesSummary span {
+  display: inline-flex;
+  align-items: center;
+}
+
 .reglamentRulesSummary::-webkit-details-marker {
   display: none;
 }
@@ -312,18 +317,24 @@ select {
 }
 
 .reglamentBlock {
-  border: 1px solid rgba(242, 238, 229, 0.12);
-  background: rgba(255, 255, 255, 0.03);
-}
-
-.reglamentBlock {
+  display: grid;
+  align-content: start;
+  gap: 14px;
   min-width: 0;
   padding: 24px;
+  border: 1px solid rgba(242, 238, 229, 0.12);
   border-radius: 24px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.038), rgba(255, 255, 255, 0.018)),
+    rgba(255, 255, 255, 0.02);
+}
+
+.reglamentBlock .sectionEyebrow {
+  margin-bottom: 0;
 }
 
 .reglamentBlock p:not(.sectionEyebrow) {
-  margin: 14px 0 0;
+  margin: 0;
   color: #cfc7ba;
   line-height: 1.65;
 }
@@ -331,7 +342,7 @@ select {
 .reglamentBlock ul {
   display: grid;
   gap: 10px;
-  margin: 18px 0 0;
+  margin: 0;
   padding: 0;
   list-style: none;
 }
@@ -355,7 +366,7 @@ select {
 }
 
 .reglamentInlineExamples {
-  margin-top: 22px;
+  margin-top: 4px;
   padding-top: 18px;
   border-top: 1px solid rgba(242, 238, 229, 0.12);
 }
@@ -394,6 +405,7 @@ select {
   display: grid;
   gap: 18px;
   margin-top: 22px;
+  max-width: 1120px;
 }
 
 .reglamentTextBlock p {
@@ -420,6 +432,7 @@ select {
   border: 1px solid rgba(242, 238, 229, 0.14);
   border-radius: 24px;
   background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 18px 46px rgba(0, 0, 0, 0.24);
 }
 
 .reglamentCupFigure img {
@@ -454,7 +467,9 @@ select {
   padding: 22px;
   border: 1px solid rgba(242, 238, 229, 0.12);
   border-radius: 22px;
-  background: rgba(255, 255, 255, 0.03);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.038), rgba(255, 255, 255, 0.018)),
+    rgba(255, 255, 255, 0.02);
 }
 
 .reglamentPunishmentType::before {
@@ -478,8 +493,7 @@ select {
   align-items: flex-start;
 }
 
-.reglamentPunishmentType h2,
-.reglamentPunishmentCasesHeader h2 {
+.reglamentPunishmentType h2 {
   margin: 0;
   color: var(--text);
   font-size: 1.26rem;
@@ -507,8 +521,15 @@ select {
   padding-top: 4px;
 }
 
-.reglamentPunishmentCasesHeader .sectionEyebrow {
+.reglamentPunishmentCasesHeader .sectionEyebrow,
+.reglamentPunishmentCasesHeader p {
   margin: 0;
+}
+
+.reglamentPunishmentCasesHeader p:not(.sectionEyebrow) {
+  color: rgba(242, 238, 229, 0.68);
+  font-size: 0.95rem;
+  line-height: 1.5;
 }
 
 .reglamentPunishmentList {
@@ -533,7 +554,9 @@ select {
   padding: 18px 18px 18px 64px;
   border: 1px solid rgba(242, 238, 229, 0.1);
   border-radius: 18px;
-  background: rgba(255, 255, 255, 0.025);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.032), rgba(255, 255, 255, 0.014)),
+    rgba(255, 255, 255, 0.018);
 }
 
 .reglamentPunishmentRule::before {
@@ -563,11 +586,12 @@ select {
 
 .reglamentPunishmentRuleTop strong {
   color: var(--text);
-  font-size: 1.06rem;
-  line-height: 1.6;
+  font-size: 1.02rem;
+  line-height: 1.45;
 }
 
 .reglamentPunishmentRule p {
+  margin: 0;
   color: rgba(242, 238, 229, 0.76);
 }
 
@@ -795,6 +819,27 @@ select.textField {
   text-align: center;
 }
 
+.adminTextInput {
+  width: 100%;
+  min-height: 38px;
+  padding: 0 10px;
+  border: 1px solid rgba(242, 238, 229, 0.2);
+  border-radius: 12px;
+  background: rgba(7, 9, 14, 0.74);
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.adminTitleInput {
+  min-width: 190px;
+}
+
+.adminDurationInput {
+  width: 116px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
 .adminActions {
   display: flex;
   flex-wrap: wrap;
@@ -810,6 +855,65 @@ select.textField {
 .archiveToggleButton {
   min-height: 44px;
   white-space: nowrap;
+}
+
+.historyAdminActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.addPlayerForm {
+  display: grid;
+  gap: 14px;
+  margin-top: 18px;
+  padding: 18px;
+  border: 1px solid rgba(242, 238, 229, 0.1);
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at top left, rgba(216, 175, 104, 0.09), transparent 34%),
+    rgba(255, 255, 255, 0.024);
+}
+
+.addPlayerFormCompact {
+  margin-top: 18px;
+}
+
+.archiveAdminForm {
+  margin-bottom: 18px;
+}
+
+.addPlayerFormHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.addPlayerFormFields {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) minmax(180px, 1fr) auto;
+  gap: 14px;
+  align-items: end;
+}
+
+.addPlayerSubmitButton {
+  min-height: 56px;
+  white-space: nowrap;
+}
+
+.formMessage {
+  margin: 0;
+  color: rgba(242, 238, 229, 0.76);
+  font-size: 0.9rem;
+}
+
+.formMessageError {
+  color: #ff9c8f;
+}
+
+.formMessageSuccess {
+  color: #a9ecbc;
 }
 
 .iconActionButton {
@@ -2410,6 +2514,23 @@ select.textField {
 }
 
 @media (max-width: 840px) {
+  .historyAdminActions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .historyAdminActions .archiveToggleButton {
+    flex: 1 1 180px;
+  }
+
+  .addPlayerFormFields {
+    grid-template-columns: 1fr;
+  }
+
+  .addPlayerSubmitButton {
+    width: 100%;
+  }
+
   .inlineFieldsRow {
     grid-template-columns: 1fr;
   }

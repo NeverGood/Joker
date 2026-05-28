@@ -18,6 +18,7 @@ import {
   normalizeInteger
 } from '../lib/game-config';
 import { formatDurationSeconds } from '../lib/game-storage';
+import AddPlayerForm, { mergePlayerList } from './AddPlayerForm';
 import ScoreboardShell from './ScoreboardShell';
 
 const DRAFT_STORAGE_KEY = 'joker-casino-current-game';
@@ -215,8 +216,9 @@ function createRandomRounds() {
   return Object.fromEntries(ROUND_PRESET.map((round) => [round.id, createRandomRoundState(round)]));
 }
 
-export default function GameBoard({ registeredPlayers = [], readOnly = false }) {
+export default function GameBoard({ registeredPlayers = [], readOnly = false, isAdmin = false }) {
   const [currentGame, setCurrentGame] = useState(createEmptyGameState());
+  const [availablePlayers, setAvailablePlayers] = useState(registeredPlayers);
   const [savedGames, setSavedGames] = useState([]);
   const [ready, setReady] = useState(false);
   const [flash, setFlash] = useState('');
@@ -227,6 +229,10 @@ export default function GameBoard({ registeredPlayers = [], readOnly = false }) 
     loadSavedGames();
     setReady(true);
   }, []);
+
+  useEffect(() => {
+    setAvailablePlayers(registeredPlayers);
+  }, [registeredPlayers]);
 
   useEffect(() => {
     if (!ready || typeof window === 'undefined') {
@@ -314,6 +320,11 @@ export default function GameBoard({ registeredPlayers = [], readOnly = false }) 
     }
 
     setCurrentGame((prev) => ({ ...prev, title: value }));
+  }
+
+  function handlePlayerCreated(player) {
+    setAvailablePlayers((currentPlayers) => mergePlayerList(currentPlayers, player));
+    setFlash(`Игрок «${player.username}» добавлен.`);
   }
 
   function addPlayerWarning(playerKey) {
@@ -556,7 +567,7 @@ export default function GameBoard({ registeredPlayers = [], readOnly = false }) 
                   disabled={readOnly}
                 >
                   <option value={DEFAULT_PLAYERS[playerKey]}>{DEFAULT_PLAYERS[playerKey]}</option>
-                  {registeredPlayers.map((player) => (
+                  {availablePlayers.map((player) => (
                     <option key={`${playerKey}-${player.id}`} value={player.username}>
                       {player.username}
                     </option>
@@ -619,6 +630,7 @@ export default function GameBoard({ registeredPlayers = [], readOnly = false }) 
               disabled={readOnly}
             />
           </label>
+          {isAdmin ? <AddPlayerForm className="addPlayerFormCompact" onPlayerCreated={handlePlayerCreated} /> : null}
         </div>
 
         <div className="panelCard">

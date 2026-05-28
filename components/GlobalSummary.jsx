@@ -3,6 +3,7 @@
 import { Fragment, useEffect, useMemo, useState } from 'react';
 import { DEFAULT_PLAYERS, PLAYER_KEYS } from '../lib/game-config';
 import { buildGameProtocol, formatDurationSeconds } from '../lib/game-storage';
+import AddPlayerForm, { mergePlayerList } from './AddPlayerForm';
 import ScoreboardShell from './ScoreboardShell';
 
 export default function GlobalSummary() {
@@ -14,6 +15,7 @@ export default function GlobalSummary() {
   const [editingGameId, setEditingGameId] = useState('');
   const [savingArchiveGame, setSavingArchiveGame] = useState(false);
   const [showArchiveForm, setShowArchiveForm] = useState(false);
+  const [showPlayerForm, setShowPlayerForm] = useState(false);
   const [archiveForm, setArchiveForm] = useState(() => createArchiveGameForm());
   const [expandedGameIds, setExpandedGameIds] = useState([]);
   const [leaderboardSort, setLeaderboardSort] = useState({
@@ -32,6 +34,7 @@ export default function GlobalSummary() {
     if (!isAdmin) {
       setRegisteredUsers([]);
       setShowArchiveForm(false);
+      setShowPlayerForm(false);
       return;
     }
 
@@ -98,7 +101,39 @@ export default function GlobalSummary() {
     );
   }
 
+  function updateSavedGameField(gameId, field, value) {
+    setSavedGames((prev) =>
+      prev.map((game) =>
+        game.id === gameId
+          ? {
+              ...game,
+              [field]: value
+            }
+          : game
+      )
+    );
+  }
+
+  function updateSavedGameDuration(gameId, value) {
+    updateSavedGameField(gameId, 'durationInput', value);
+  }
+
   async function saveGameTotals(game) {
+    const title = String(game.title || '').trim();
+    const durationSeconds = parseDurationInput(
+      game.durationInput ?? (game.durationSeconds > 0 ? formatDurationSeconds(game.durationSeconds) : '')
+    );
+
+    if (!title) {
+      window.alert('Укажи название партии.');
+      return;
+    }
+
+    if (durationSeconds === null) {
+      window.alert('Укажи время игры в формате ЧЧ:ММ:СС или ММ:СС.');
+      return;
+    }
+
     try {
       setSavingGameId(game.id);
       const response = await fetch(`/api/games/${game.id}`, {
@@ -107,6 +142,8 @@ export default function GlobalSummary() {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
+          title,
+          durationSeconds,
           totals: game.totals
         })
       });
@@ -117,14 +154,20 @@ export default function GlobalSummary() {
       }
 
       setSavedGames((prev) =>
-        prev.map((savedGame) =>
-          savedGame.id === game.id
-            ? {
-                ...savedGame,
-                totals: data.totals
-              }
-            : savedGame
-        )
+        prev.map((savedGame) => {
+          if (savedGame.id !== game.id) {
+            return savedGame;
+          }
+
+          const { durationInput, ...restGame } = savedGame;
+
+          return {
+            ...restGame,
+            title: data.title,
+            durationSeconds: data.durationSeconds,
+            totals: data.totals
+          };
+        })
       );
       setEditingGameId('');
     } catch (error) {
@@ -208,6 +251,11 @@ export default function GlobalSummary() {
         [playerKey]: value
       }
     }));
+  }
+
+  function handlePlayerCreated(player) {
+    setRegisteredUsers((currentUsers) => mergePlayerList(currentUsers, player));
+    setArchiveForm((currentForm) => createArchiveGameForm(mergePlayerList(registeredUsers, player), currentForm));
   }
 
   function toggleGameProtocol(gameId) {
@@ -393,15 +441,27 @@ export default function GlobalSummary() {
             <h2 className="sectionTitle">Все сохраненные игры</h2>
           </div>
           {isAdmin ? (
-            <button
-              type="button"
-              className="secondaryButton archiveToggleButton"
-              onClick={() => setShowArchiveForm((isShown) => !isShown)}
-            >
-              {showArchiveForm ? 'Скрыть форму' : 'Добавить игру в архив'}
-            </button>
+            <div className="historyAdminActions">
+              <button
+                type="button"
+                className="secondaryButton archiveToggleButton"
+                onClick={() => setShowPlayerForm((isShown) => !isShown)}
+              >
+                {showPlayerForm ? 'Скрыть игрока' : 'Добавить игрока'}
+              </button>
+              <button
+                type="button"
+                className="secondaryButton archiveToggleButton"
+                onClick={() => setShowArchiveForm((isShown) => !isShown)}
+              >
+                {showArchiveForm ? 'Скрыть форму' : 'Добавить игру в архив'}
+              </button>
+            </div>
           ) : null}
         </div>
+        {isAdmin && showPlayerForm ? (
+          <AddPlayerForm className="archiveAdminForm" onPlayerCreated={handlePlayerCreated} />
+        ) : null}
         {isAdmin && showArchiveForm ? (
           <form className="archiveGameForm" onSubmit={createArchiveGame}>
             <div className="archiveGameMetaGrid">
@@ -504,14 +564,40 @@ export default function GlobalSummary() {
                   return (
                     <Fragment key={game.id}>
                       <tr key={game.id}>
-                        <td className="historyTitleColumn historyTitleCell">{game.title}</td>
+                        <td className="historyTitleColumn historyTitleCell">
+                          {isAdmin && isEditing ? (
+                            <input
+                              className="adminTextInput adminTitleInput"
+                              value={game.title}
+                              onChange={(event) => updateSavedGameField(game.id, 'title', event.target.value)}
+                              aria-label="Название партии"
+                            />
+                          ) : (
+                            game.title
+                          )}
+                        </td>
                         <td>
                           <div className="historyDateCell">
                             <span className="historyDateValue">{formatHistoryDate(game.createdAt)}</span>
                             <span className="historyTimeValue">{formatHistoryTime(game.createdAt)}</span>
                           </div>
                         </td>
-                        <td>{game.durationSeconds > 0 ? formatDurationSeconds(game.durationSeconds) : '—'}</td>
+                        <td>
+                          {isAdmin && isEditing ? (
+                            <input
+                              className="adminTextInput adminDurationInput"
+                              value={
+                                game.durationInput ??
+                                (game.durationSeconds > 0 ? formatDurationSeconds(game.durationSeconds) : '')
+                              }
+                              onChange={(event) => updateSavedGameDuration(game.id, event.target.value)}
+                              placeholder="01:24:15"
+                              aria-label="Время игры"
+                            />
+                          ) : (
+                            game.durationSeconds > 0 ? formatDurationSeconds(game.durationSeconds) : '—'
+                          )}
+                        </td>
                         {PLAYER_KEYS.map((playerKey) => (
                           <td key={`${game.id}-${playerKey}`}>
                             <div className="historyPlayerCell">
@@ -546,7 +632,7 @@ export default function GlobalSummary() {
                                 className={`iconActionButton ${isEditing ? 'iconActionButtonActive' : ''}`}
                                 onClick={() => handleEditAction(game)}
                                 disabled={isSaving}
-                                aria-label={isEditing ? 'Сохранить изменения' : 'Редактировать счет партии'}
+                                aria-label={isEditing ? 'Сохранить изменения' : 'Редактировать партию'}
                                 title={isEditing ? 'Сохранить' : 'Редактировать'}
                               >
                                 {isEditing ? <CheckIcon /> : <PencilIcon />}
@@ -625,7 +711,7 @@ function buildLeaderboard(games) {
 function createArchiveGameForm(users = [], currentForm = null) {
   const userNames = users.map((user) => user.username).filter(Boolean);
   const fallbackPlayers = Object.fromEntries(
-    PLAYER_KEYS.map((playerKey, index) => [playerKey, userNames[index] || currentForm?.players?.[playerKey] || ''])
+    PLAYER_KEYS.map((playerKey, index) => [playerKey, currentForm?.players?.[playerKey] || userNames[index] || ''])
   );
 
   return {

@@ -7,26 +7,53 @@ function cleanTotal(value) {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
+function cleanDurationSeconds(value) {
+  const parsed = Number(value ?? 0);
+  return Number.isFinite(parsed) && parsed > 0 ? Math.floor(parsed) : 0;
+}
+
+function cleanTitle(value) {
+  return String(value ?? '').trim();
+}
+
 export async function PATCH(request, { params }) {
   try {
     await requireAdminUser();
 
     const payload = await request.json();
     const totals = payload?.totals || {};
+    const title = cleanTitle(payload?.title);
+
+    if (Object.prototype.hasOwnProperty.call(payload, 'title') && !title) {
+      return NextResponse.json({ error: 'Укажи название партии.' }, { status: 400 });
+    }
+
+    const updateData = {
+      player1Total: cleanTotal(totals.player1),
+      player2Total: cleanTotal(totals.player2),
+      player3Total: cleanTotal(totals.player3),
+      player4Total: cleanTotal(totals.player4)
+    };
+
+    if (Object.prototype.hasOwnProperty.call(payload, 'title')) {
+      updateData.title = title;
+    }
+
+    if (Object.prototype.hasOwnProperty.call(payload, 'durationSeconds')) {
+      updateData.durationSeconds = cleanDurationSeconds(payload.durationSeconds);
+    }
+
     const updated = await prisma.game.update({
       where: {
         id: params.id
       },
-      data: {
-        player1Total: cleanTotal(totals.player1),
-        player2Total: cleanTotal(totals.player2),
-        player3Total: cleanTotal(totals.player3),
-        player4Total: cleanTotal(totals.player4)
-      }
+      data: updateData
     });
 
     return NextResponse.json({
       id: updated.id,
+      title: updated.title,
+      durationSeconds: updated.durationSeconds,
       totals: {
         player1: updated.player1Total,
         player2: updated.player2Total,
