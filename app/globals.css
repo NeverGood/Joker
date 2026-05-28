@@ -266,13 +266,13 @@ select {
 .reglamentHero {
   display: flex;
   align-items: flex-end;
-  min-height: clamp(120px, 13vw, 210px);
+  min-height: clamp(104px, 10vw, 176px);
   margin: 0 0 26px;
   padding: clamp(26px, 4vw, 64px) clamp(4px, 1.4vw, 22px) clamp(10px, 1.7vw, 24px);
 }
 
 .reglamentHero .sectionTitle {
-  font-size: clamp(3.6rem, 8vw, 8.5rem);
+  font-size: clamp(3.2rem, 6.4vw, 7rem);
   line-height: 0.86;
   text-shadow: 0 18px 44px rgba(0, 0, 0, 0.42);
 }
@@ -1946,7 +1946,7 @@ select.textField {
   }
 
   .reglamentHero .sectionTitle {
-    font-size: clamp(2.7rem, 14vw, 4.2rem);
+    font-size: clamp(2.35rem, 11vw, 3.6rem);
   }
 
   .reglamentRulesPanel {
