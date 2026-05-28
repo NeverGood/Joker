@@ -83,6 +83,10 @@ select {
   margin: 0 auto;
 }
 
+.reglamentFrame {
+  max-width: 1840px;
+}
+
 .topBar,
 .heroCard,
 .panelCard,
@@ -405,13 +409,30 @@ select {
   display: grid;
   gap: 18px;
   margin-top: 22px;
-  max-width: 1120px;
+  width: 100%;
+  max-width: none;
 }
 
 .reglamentTextBlock p {
   margin: 0;
   color: #cfc7ba;
   line-height: 1.7;
+}
+
+.reglamentHistoryBlock {
+  display: block;
+  column-count: 2;
+  column-gap: 34px;
+  column-rule: 1px solid rgba(242, 238, 229, 0.1);
+}
+
+.reglamentHistoryBlock p {
+  break-inside: avoid;
+  margin: 0 0 18px;
+}
+
+.reglamentHistoryBlock p:last-child {
+  margin-bottom: 0;
 }
 
 .reglamentCupLayout {
@@ -456,7 +477,7 @@ select {
 
 .reglamentPunishmentTypes {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
   gap: 16px;
 }
 
@@ -534,6 +555,7 @@ select {
 
 .reglamentPunishmentList {
   display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
   counter-reset: punishment;
   margin: 4px 0 0;
@@ -582,6 +604,7 @@ select {
   align-items: flex-start;
   justify-content: space-between;
   gap: 14px;
+  flex-wrap: wrap;
 }
 
 .reglamentPunishmentRuleTop strong {
@@ -1823,6 +1846,14 @@ select.textField {
 @media (max-width: 1180px) {
   .heroCard,
   .panelGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .reglamentHistoryBlock {
+    column-count: 1;
+  }
+
+  .reglamentPunishmentList {
     grid-template-columns: 1fr;
   }
 

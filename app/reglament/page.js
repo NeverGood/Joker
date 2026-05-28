@@ -187,7 +187,7 @@ export const metadata = {
 
 export default function ReglamentPage() {
   return (
-    <ScoreboardShell active="reglament">
+    <ScoreboardShell active="reglament" frameClassName="reglamentFrame">
       <section className="reglamentHero panelCard panelCardWide">
         <h1 className="sectionTitle">Регламент</h1>
       </section>
@@ -196,7 +196,7 @@ export default function ReglamentPage() {
         <summary className="reglamentRulesSummary">
           <span>История</span>
         </summary>
-        <div className="reglamentTextBlock">
+        <div className="reglamentTextBlock reglamentHistoryBlock">
           {historyParagraphs.map((paragraph) => (
             <p key={paragraph}>{paragraph}</p>
           ))}

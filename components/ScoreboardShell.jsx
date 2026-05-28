@@ -3,13 +3,14 @@ import AuthNav from './AuthNav';
 
 export default function ScoreboardShell({
   active = 'game',
+  frameClassName = '',
   children
 }) {
   return (
     <main className="pageShell">
       <div className="ambientGlow ambientGlowLeft" />
       <div className="ambientGlow ambientGlowRight" />
-      <section className="casinoFrame">
+      <section className={frameClassName ? `casinoFrame ${frameClassName}` : 'casinoFrame'}>
         <header className="topBar">
           <Link href="/" className="brandMark">
             Joker Bus-Angeles Edition
