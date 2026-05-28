@@ -311,8 +311,7 @@ select {
   margin-top: 22px;
 }
 
-.reglamentBlock,
-.reglamentExampleCard {
+.reglamentBlock {
   border: 1px solid rgba(242, 238, 229, 0.12);
   background: rgba(255, 255, 255, 0.03);
 }
@@ -321,13 +320,6 @@ select {
   min-width: 0;
   padding: 24px;
   border-radius: 24px;
-}
-
-.reglamentBlock h2 {
-  margin: 0;
-  color: var(--text);
-  font-size: 1.45rem;
-  line-height: 1.15;
 }
 
 .reglamentBlock p:not(.sectionEyebrow) {
@@ -362,34 +354,39 @@ select {
   content: '';
 }
 
-.reglamentExamples {
-  margin-top: 24px;
+.reglamentInlineExamples {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(242, 238, 229, 0.12);
 }
 
-.reglamentExamplesGrid {
+.reglamentInlineExamplesGrid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 14px;
-  margin-top: 18px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 18px;
+  margin-top: 12px;
 }
 
-.reglamentExampleCard {
-  display: grid;
+.reglamentInlineExample {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
   gap: 12px;
-  min-height: 120px;
-  align-content: space-between;
-  padding: 18px;
-  border-radius: 20px;
+  min-width: 0;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(242, 238, 229, 0.08);
 }
 
-.reglamentExampleCard span {
+.reglamentInlineExample span {
+  min-width: 0;
   color: rgba(242, 238, 229, 0.72);
   line-height: 1.45;
 }
 
-.reglamentExampleCard strong {
+.reglamentInlineExample strong {
+  min-width: max-content;
   color: var(--gold-strong);
-  font-size: 1.9rem;
+  font-size: 1.2rem;
   font-variant-numeric: tabular-nums;
 }
 
@@ -1814,7 +1811,7 @@ select.textField {
   }
 
   .reglamentGrid,
-  .reglamentExamplesGrid {
+  .reglamentInlineExamplesGrid {
     grid-template-columns: 1fr;
     gap: 12px;
   }
@@ -1828,14 +1825,10 @@ select.textField {
     border-radius: 18px;
   }
 
-  .reglamentBlock h2 {
-    font-size: 1.24rem;
-  }
-
-  .reglamentExampleCard {
-    min-height: 0;
-    padding: 16px;
-    border-radius: 18px;
+  .reglamentInlineExample {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
   }
 
   .reglamentPunishmentTypes {

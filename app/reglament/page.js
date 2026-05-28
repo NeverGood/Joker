@@ -41,17 +41,30 @@ const ruleBlocks = [
       'Если игрок взял ровно заказ, он получает плюс цену заказа.',
       'Если игрок заказал и взял все карты, он получает количество карт * 100.',
       'Если игрок взял больше заказа, он получает количество взяток * 10.'
-    ]
+    ],
+    examples: true
   },
   {
     eyebrow: 'Премия',
     title: 'Идеальный блок',
-    lead: 'Премия считается отдельно внутри каждого блока: разгон, первые девятки, спуск и финальные девятки.',
+    lead: 'Премия считается отдельно для каждого блока раздач.',
     items: [
       'Игрок претендует на премию, если во всех раздачах блока взял ровно столько, сколько заказал.',
       'Премия равна: (очки игрока в последней раздаче блока + лучший положительный результат следующего игрока в этом блоке) * 2.',
       'У следующего игрока выбранный лучший результат срезается из итога блока.',
       'Если следующий игрок тоже премиальный, его последняя раздача не используется для среза.'
+    ]
+  },
+  {
+    eyebrow: 'Джокер',
+    lead: 'В игре есть 2 джокера. Джокер очень сильная карта которая может изменить ход игры.',
+    items: [
+      'Джокер можно кидать в любой момент своего хода, например что бы перебить любой козырь игрока.',
+      'Так же при своем ходе джокер может сделать заказ хода.',
+      'Например сказать что берет определенная масть: при этом если масти нет, игрок обязан кинуть козырь и забрать взятку.',
+      'Так же можно потребовать скинуть старший козырь или младшую масть и т.д.',
+      'Можно скинуть джокер в любой момент что бы не бить карту на столе.',
+      'Второй джокер может перебить первый джокер.'
     ]
   }
 ];
@@ -164,9 +177,8 @@ export default function ReglamentPage() {
         </summary>
         <div className="reglamentGrid" aria-label="Правила игры">
           {ruleBlocks.map((block) => (
-            <article className="reglamentBlock" key={block.title || block.eyebrow}>
+            <article className="reglamentBlock" key={block.eyebrow}>
               <p className="sectionEyebrow">{block.eyebrow}</p>
-              {block.title ? <h2>{block.title}</h2> : null}
               <p>{block.lead}</p>
               <ul>
                 {block.items.map((item) => (
@@ -174,23 +186,21 @@ export default function ReglamentPage() {
                 ))}
               </ul>
               {block.note ? <p>{block.note}</p> : null}
+              {block.examples ? (
+                <div className="reglamentInlineExamples" aria-label="Примеры подсчета очков">
+                  <p className="sectionEyebrow">Примеры подсчета</p>
+                  <div className="reglamentInlineExamplesGrid">
+                    {examples.map((example) => (
+                      <div className="reglamentInlineExample" key={example.label}>
+                        <span>{example.label}</span>
+                        <strong>{example.value}</strong>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
             </article>
           ))}
-        </div>
-
-        <div className="reglamentExamples">
-          <div>
-            <p className="sectionEyebrow">Examples</p>
-            <h2 className="sectionTitle">Примеры подсчета</h2>
-          </div>
-          <div className="reglamentExamplesGrid">
-            {examples.map((example) => (
-              <div className="reglamentExampleCard" key={example.label}>
-                <span>{example.label}</span>
-                <strong>{example.value}</strong>
-              </div>
-            ))}
-          </div>
         </div>
       </details>
 
