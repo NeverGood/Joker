@@ -16,6 +16,14 @@ export default function GlobalSummary() {
   const [savingArchiveGame, setSavingArchiveGame] = useState(false);
   const [showArchiveForm, setShowArchiveForm] = useState(false);
   const [showPlayerForm, setShowPlayerForm] = useState(false);
+  const [showRenamePlayerForm, setShowRenamePlayerForm] = useState(false);
+  const [renamingPlayer, setRenamingPlayer] = useState(false);
+  const [renamePlayerForm, setRenamePlayerForm] = useState({
+    userId: '',
+    username: ''
+  });
+  const [renamePlayerMessage, setRenamePlayerMessage] = useState('');
+  const [renamePlayerError, setRenamePlayerError] = useState('');
   const [archiveForm, setArchiveForm] = useState(() => createArchiveGameForm());
   const [expandedGameIds, setExpandedGameIds] = useState([]);
   const [leaderboardSort, setLeaderboardSort] = useState({
@@ -35,6 +43,7 @@ export default function GlobalSummary() {
       setRegisteredUsers([]);
       setShowArchiveForm(false);
       setShowPlayerForm(false);
+      setShowRenamePlayerForm(false);
       return;
     }
 
@@ -258,6 +267,81 @@ export default function GlobalSummary() {
     setArchiveForm((currentForm) => createArchiveGameForm(mergePlayerList(registeredUsers, player), currentForm));
   }
 
+  function updateRenamePlayerUser(userId) {
+    const selectedUser = registeredUsers.find((user) => user.id === userId);
+
+    setRenamePlayerForm({
+      userId,
+      username: selectedUser?.username || ''
+    });
+    setRenamePlayerMessage('');
+    setRenamePlayerError('');
+  }
+
+  function updateRenamePlayerName(username) {
+    setRenamePlayerForm((currentForm) => ({
+      ...currentForm,
+      username
+    }));
+    setRenamePlayerMessage('');
+    setRenamePlayerError('');
+  }
+
+  async function renamePlayer(event) {
+    event.preventDefault();
+
+    const selectedUser = registeredUsers.find((user) => user.id === renamePlayerForm.userId);
+    const username = String(renamePlayerForm.username || '').trim();
+
+    if (!selectedUser) {
+      setRenamePlayerError('Выбери игрока из списка.');
+      setRenamePlayerMessage('');
+      return;
+    }
+
+    if (!username) {
+      setRenamePlayerError('Укажи новое имя игрока.');
+      setRenamePlayerMessage('');
+      return;
+    }
+
+    try {
+      setRenamingPlayer(true);
+      setRenamePlayerError('');
+      setRenamePlayerMessage('');
+
+      const response = await fetch(`/api/users/${selectedUser.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          username
+        })
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data?.error || 'Не удалось переименовать игрока.');
+      }
+
+      setRegisteredUsers((currentUsers) => mergePlayerList(currentUsers, data.user));
+      setArchiveForm((currentForm) => replaceArchivePlayerName(currentForm, selectedUser.username, data.user.username));
+      setRenamePlayerForm({
+        userId: data.user.id,
+        username: data.user.username
+      });
+      setRenamePlayerMessage(
+        `Игрок «${selectedUser.username}» переименован в «${data.user.username}». Обновлено партий: ${data.updatedGames}.`
+      );
+      await Promise.all([loadRegisteredUsers(), loadGames()]);
+    } catch (error) {
+      setRenamePlayerError(error.message || 'Не удалось переименовать игрока.');
+    } finally {
+      setRenamingPlayer(false);
+    }
+  }
+
   function toggleGameProtocol(gameId) {
     setExpandedGameIds((currentIds) =>
       currentIds.includes(gameId)
@@ -452,6 +536,13 @@ export default function GlobalSummary() {
               <button
                 type="button"
                 className="secondaryButton archiveToggleButton"
+                onClick={() => setShowRenamePlayerForm((isShown) => !isShown)}
+              >
+                {showRenamePlayerForm ? 'Скрыть переименование' : 'Переименовать игрока'}
+              </button>
+              <button
+                type="button"
+                className="secondaryButton archiveToggleButton"
                 onClick={() => setShowArchiveForm((isShown) => !isShown)}
               >
                 {showArchiveForm ? 'Скрыть форму' : 'Добавить игру в архив'}
@@ -461,6 +552,44 @@ export default function GlobalSummary() {
         </div>
         {isAdmin && showPlayerForm ? (
           <AddPlayerForm className="archiveAdminForm" onPlayerCreated={handlePlayerCreated} />
+        ) : null}
+        {isAdmin && showRenamePlayerForm ? (
+          <form className="addPlayerForm archiveAdminForm renamePlayerForm" onSubmit={renamePlayer}>
+            <div className="addPlayerFormHeader">
+              <p className="sectionEyebrow">Переименование игрока</p>
+            </div>
+            <div className="addPlayerFormFields">
+              <label className="titleField">
+                <span className="fieldLabel">Игрок</span>
+                <select
+                  className="textField"
+                  value={renamePlayerForm.userId}
+                  onChange={(event) => updateRenamePlayerUser(event.target.value)}
+                >
+                  <option value="">Выбери игрока</option>
+                  {registeredUsers.map((user) => (
+                    <option key={`rename-${user.id}`} value={user.id}>
+                      {user.username}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="titleField">
+                <span className="fieldLabel">Новое имя</span>
+                <input
+                  className="textField"
+                  value={renamePlayerForm.username}
+                  onChange={(event) => updateRenamePlayerName(event.target.value)}
+                  placeholder="Например, Ржавый"
+                />
+              </label>
+              <button type="submit" className="primaryButton addPlayerSubmitButton" disabled={renamingPlayer}>
+                {renamingPlayer ? 'Сохраняем...' : 'Переименовать'}
+              </button>
+            </div>
+            {renamePlayerError ? <p className="formMessage formMessageError">{renamePlayerError}</p> : null}
+            {renamePlayerMessage ? <p className="formMessage formMessageSuccess">{renamePlayerMessage}</p> : null}
+          </form>
         ) : null}
         {isAdmin && showArchiveForm ? (
           <form className="archiveGameForm" onSubmit={createArchiveGame}>
@@ -721,6 +850,18 @@ function createArchiveGameForm(users = [], currentForm = null) {
     players: fallbackPlayers,
     totals: Object.fromEntries(
       PLAYER_KEYS.map((playerKey) => [playerKey, currentForm?.totals?.[playerKey] ?? '0'])
+    )
+  };
+}
+
+function replaceArchivePlayerName(currentForm, oldUsername, newUsername) {
+  return {
+    ...currentForm,
+    players: Object.fromEntries(
+      PLAYER_KEYS.map((playerKey) => [
+        playerKey,
+        currentForm?.players?.[playerKey] === oldUsername ? newUsername : currentForm?.players?.[playerKey] || ''
+      ])
     )
   };
 }
