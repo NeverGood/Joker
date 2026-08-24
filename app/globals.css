@@ -2253,16 +2253,14 @@ select.textField {
   }
 
   .mobileRoundMeta {
-    display: grid;
-    flex: 1 1 auto;
+    display: inline-flex;
+    flex: 0 1 auto;
     min-width: 0;
     align-items: center;
-    grid-template-columns: auto minmax(42px, 1fr) auto;
-    gap: 6px;
+    gap: 7px;
   }
 
   .mobileRoundMeta .dealerLabel {
-    justify-self: center;
     margin: 0;
     transform: translateY(1px);
   }
@@ -2414,7 +2412,7 @@ select.textField {
 
   .mobileCurrentRoundJump {
     position: fixed;
-    right: calc(16px + env(safe-area-inset-right));
+    right: calc(24px + env(safe-area-inset-right));
     bottom: calc(18px + env(safe-area-inset-bottom));
     z-index: 80;
     display: inline-flex;
