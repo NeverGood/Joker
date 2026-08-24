@@ -726,6 +726,19 @@ export default function GameBoard({ registeredPlayers = [], readOnly = false }) 
       </section>
 
       <section className="tablePanel">
+        <div className="mobileScoreDock" aria-label="Общий счет игроков">
+          {PLAYER_KEYS.map((playerKey) => (
+            <div className="mobileScoreDockItem" key={`mobile-score-${playerKey}`}>
+              <span>{currentGame.players[playerKey] || DEFAULT_PLAYERS[playerKey]}</span>
+              <strong>
+                {totals[playerKey]}
+                {premiumContenders[playerKey] ? (
+                  <span className="premiumMarker" aria-label="Претендует на премию" title="Претендует на премию">💰</span>
+                ) : null}
+              </strong>
+            </div>
+          ))}
+        </div>
         {tableLocked && !readOnly ? (
           <div className="tableLockNotice">
             Нажми «Начать игру», чтобы разблокировать таблицу и начать отсчет времени.
@@ -921,6 +934,7 @@ function RoundCard({ round, currentGame, updateRoundValue, readOnly, showBlockSu
           <span className="dealerLabel">Раздает</span>
           <span className="dealerPill">{currentGame.players[round.dealerKey] || DEFAULT_PLAYERS[round.dealerKey]}</span>
         </div>
+        {isCurrentRound ? <span className="mobileCurrentRoundPill">Текущий ход</span> : null}
       </div>
 
       {hasInvalidTrickTotal ? (

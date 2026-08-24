@@ -1359,6 +1359,10 @@ select.textField {
   display: none;
 }
 
+.mobileScoreDock {
+  display: none;
+}
+
 .mobileMiniLabel {
   display: none;
 }
@@ -2066,11 +2070,13 @@ select.textField {
   }
 
   select.textField {
+    min-height: 56px;
     padding-right: 38px;
     background:
       linear-gradient(45deg, transparent 50%, rgba(242, 238, 229, 0.58) 50%) right 19px center / 6px 6px no-repeat,
       linear-gradient(135deg, rgba(242, 238, 229, 0.58) 50%, transparent 50%) right 14px center / 6px 6px no-repeat,
       var(--field);
+    font-weight: 700;
   }
 
   .playerActionRow,
@@ -2152,6 +2158,56 @@ select.textField {
     display: none;
   }
 
+  .mobileScoreDock {
+    position: sticky;
+    top: 0;
+    z-index: 24;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+    margin: -2px -2px 12px;
+    padding: 8px;
+    border: 1px solid rgba(255, 221, 128, 0.4);
+    border-radius: 18px;
+    background:
+      radial-gradient(circle at top left, rgba(255, 221, 128, 0.2), transparent 38%),
+      linear-gradient(180deg, rgba(18, 20, 29, 0.98), rgba(7, 9, 14, 0.96));
+    box-shadow:
+      0 18px 38px rgba(0, 0, 0, 0.42),
+      0 0 0 1px rgba(255, 236, 172, 0.08) inset;
+    backdrop-filter: blur(18px);
+  }
+
+  .mobileScoreDockItem {
+    display: grid;
+    min-width: 0;
+    gap: 3px;
+    padding: 8px 6px;
+    border: 1px solid rgba(242, 238, 229, 0.08);
+    border-radius: 13px;
+    background: rgba(255, 255, 255, 0.035);
+  }
+
+  .mobileScoreDockItem span {
+    overflow: hidden;
+    color: rgba(242, 238, 229, 0.62);
+    font-size: 0.67rem;
+    font-weight: 700;
+    line-height: 1.1;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .mobileScoreDockItem strong {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    color: var(--gold-strong);
+    font-size: 1.08rem;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+
   .mobileRoundsStack {
     display: grid;
     gap: 12px;
@@ -2205,6 +2261,23 @@ select.textField {
     text-transform: uppercase;
   }
 
+  .mobileCurrentRoundPill {
+    display: inline-flex;
+    min-height: 30px;
+    align-items: center;
+    justify-content: center;
+    padding: 0 12px;
+    border: 1px solid rgba(255, 221, 128, 0.56);
+    border-radius: 999px;
+    background: rgba(216, 175, 104, 0.16);
+    color: #ffe4a1;
+    font-size: 0.66rem;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
   .mobileRoundWarning {
     display: block;
     padding: 8px 10px;
@@ -2220,7 +2293,7 @@ select.textField {
 
   .mobileRoundPlayerCell {
     min-width: 0;
-    padding: 12px;
+    padding: 14px;
     border: 1px solid rgba(242, 238, 229, 0.07);
     border-radius: 16px;
     background: rgba(5, 6, 8, 0.28);
@@ -2234,24 +2307,34 @@ select.textField {
 
   .mobileRoundPlayerCell .inlineFieldsRow {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
   }
 
   .mobileMiniLabel {
     display: block;
     color: rgba(242, 238, 229, 0.48);
-    font-size: 0.62rem;
+    font-size: 0.68rem;
     font-weight: 800;
     letter-spacing: 0.16em;
     text-transform: uppercase;
   }
 
   .miniSelect {
-    min-height: 42px;
-    border-radius: 13px;
+    height: 58px;
+    min-height: 58px;
+    padding: 0 46px 0 16px;
+    border-radius: 16px;
+    background:
+      linear-gradient(45deg, transparent 50%, rgba(255, 230, 170, 0.78) 50%) right 24px center / 8px 8px no-repeat,
+      linear-gradient(135deg, rgba(255, 230, 170, 0.78) 50%, transparent 50%) right 17px center / 8px 8px no-repeat,
+      rgba(7, 9, 14, 0.88);
+    font-size: 1.08rem;
+    font-weight: 800;
   }
 
   .roundPlayerScore {
-    min-height: 34px;
+    min-height: 40px;
+    font-size: 1rem;
   }
 
   .mobileBlockSummary {
@@ -2575,7 +2658,58 @@ select.textField {
 }
 
 .mobileRoundCardCurrent {
-  transform: translateX(-8px);
-  border-color: rgba(216, 175, 104, 0.26);
-  box-shadow: 0 22px 46px rgba(0, 0, 0, 0.28);
+  position: relative;
+  overflow: hidden;
+  transform: none;
+  border-color: rgba(255, 221, 128, 0.86);
+  background:
+    radial-gradient(circle at top left, rgba(255, 221, 128, 0.22), transparent 46%),
+    linear-gradient(180deg, rgba(216, 175, 104, 0.09), rgba(255, 255, 255, 0.018)),
+    rgba(255, 255, 255, 0.024);
+  box-shadow:
+    0 22px 52px rgba(0, 0, 0, 0.36),
+    0 0 0 2px rgba(255, 221, 128, 0.14) inset,
+    0 0 34px rgba(216, 175, 104, 0.18);
+}
+
+.mobileRoundCardCurrent::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 5px;
+  background: linear-gradient(180deg, #ffe6a3, rgba(216, 175, 104, 0.44));
+  content: '';
+}
+
+.mobileRoundCardCurrent .mobileRoundEyebrow,
+.mobileRoundCardCurrent .dealerPill {
+  color: #ffe4a1;
+}
+
+.mobileRoundCardCurrent .mobileRoundPlayerCell {
+  border-color: rgba(255, 221, 128, 0.2);
+  background: rgba(7, 9, 14, 0.5);
+}
+
+@media (max-width: 700px) {
+  .mobileRoundPlayerCell .miniFieldGroup {
+    gap: 8px;
+  }
+
+  .mobileRoundPlayerCell .miniSelect {
+    height: 58px;
+    min-height: 58px;
+    padding: 0 46px 0 16px;
+    border-radius: 16px;
+    background:
+      linear-gradient(45deg, transparent 50%, rgba(255, 230, 170, 0.78) 50%) right 24px center / 8px 8px no-repeat,
+      linear-gradient(135deg, rgba(255, 230, 170, 0.78) 50%, transparent 50%) right 17px center / 8px 8px no-repeat,
+      rgba(7, 9, 14, 0.88);
+    font-size: 1.08rem;
+    font-weight: 800;
+  }
+
+  .mobileRoundPlayerCell .roundPlayerScore {
+    min-height: 40px;
+    font-size: 1rem;
+  }
 }
