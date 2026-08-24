@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   GAME_BLOCKS,
   PLAYER_KEYS,
@@ -22,6 +22,7 @@ import ScoreboardShell from './ScoreboardShell';
 
 const DRAFT_STORAGE_KEY = 'joker-casino-current-game';
 const PENALTY_POINTS = 250;
+const MOBILE_MEDIA_QUERY = '(max-width: 700px)';
 
 const playerAccent = {
   player1: 'playerAccentOne',
@@ -221,6 +222,8 @@ export default function GameBoard({ registeredPlayers = [], readOnly = false }) 
   const [ready, setReady] = useState(false);
   const [flash, setFlash] = useState('');
   const [timerNow, setTimerNow] = useState(() => Date.now());
+  const [showCurrentRoundButton, setShowCurrentRoundButton] = useState(false);
+  const currentRoundCardRef = useRef(null);
 
   useEffect(() => {
     setCurrentGame(readDraft());
@@ -293,6 +296,65 @@ export default function GameBoard({ registeredPlayers = [], readOnly = false }) 
   );
   const tableLocked = readOnly || currentGame.status === 'idle';
   const canSaveGame = !readOnly && currentGame.status === 'finished';
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return undefined;
+    }
+
+    const mediaQuery = window.matchMedia(MOBILE_MEDIA_QUERY);
+    let observer;
+
+    const observeCurrentRound = () => {
+      if (observer) {
+        observer.disconnect();
+      }
+
+      if (!mediaQuery.matches || !currentRoundCardRef.current) {
+        setShowCurrentRoundButton(false);
+        return;
+      }
+
+      observer = new IntersectionObserver(
+        ([entry]) => {
+          setShowCurrentRoundButton(!entry.isIntersecting || entry.intersectionRatio < 0.62);
+        },
+        {
+          rootMargin: '-92px 0px -76px 0px',
+          threshold: [0, 0.25, 0.5, 0.62, 0.75, 1]
+        }
+      );
+      observer.observe(currentRoundCardRef.current);
+    };
+
+    observeCurrentRound();
+
+    if (typeof mediaQuery.addEventListener === 'function') {
+      mediaQuery.addEventListener('change', observeCurrentRound);
+    } else {
+      mediaQuery.addListener(observeCurrentRound);
+    }
+
+    return () => {
+      if (observer) {
+        observer.disconnect();
+      }
+
+      if (typeof mediaQuery.removeEventListener === 'function') {
+        mediaQuery.removeEventListener('change', observeCurrentRound);
+      } else {
+        mediaQuery.removeListener(observeCurrentRound);
+      }
+    };
+  }, [currentRoundId]);
+
+  function scrollToCurrentRound() {
+    if (!currentRoundCardRef.current) {
+      return;
+    }
+
+    currentRoundCardRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 
   function updatePlayer(playerKey, value) {
     if (readOnly) {
@@ -811,12 +873,21 @@ export default function GameBoard({ registeredPlayers = [], readOnly = false }) 
                     showBlockSummary={index === blockRounds.length - 1}
                     blockSummary={blockSummary}
                     isCurrentRound={round.id === currentRoundId}
+                    currentRoundRef={round.id === currentRoundId ? currentRoundCardRef : null}
                   />
                 ))}
               </div>
             );
           })}
         </div>
+        <button
+          type="button"
+          className={`mobileCurrentRoundJump ${showCurrentRoundButton ? 'mobileCurrentRoundJumpVisible' : ''}`}
+          onClick={scrollToCurrentRound}
+          tabIndex={showCurrentRoundButton ? 0 : -1}
+        >
+          К текущему ходу
+        </button>
       </section>
 
     </ScoreboardShell>
@@ -919,7 +990,16 @@ function RoundRows({
   );
 }
 
-function RoundCard({ round, currentGame, updateRoundValue, readOnly, showBlockSummary, blockSummary, isCurrentRound }) {
+function RoundCard({
+  round,
+  currentGame,
+  updateRoundValue,
+  readOnly,
+  showBlockSummary,
+  blockSummary,
+  isCurrentRound,
+  currentRoundRef
+}) {
   const roundState = currentGame.rounds[round.id];
   const forbiddenLastBid = getLastBidRestriction(round, roundState);
   const trickTotal = getRoundTrickTotal(roundState);
@@ -927,7 +1007,7 @@ function RoundCard({ round, currentGame, updateRoundValue, readOnly, showBlockSu
   const hasInvalidTrickTotal = areTricksFilled && trickTotal !== round.cards;
 
   return (
-    <article className={isCurrentRound ? 'mobileRoundCard mobileRoundCardCurrent' : 'mobileRoundCard'}>
+    <article ref={currentRoundRef} className={isCurrentRound ? 'mobileRoundCard mobileRoundCardCurrent' : 'mobileRoundCard'}>
       <div className="mobileRoundHeader">
         <div>
           <span className="mobileRoundEyebrow">{round.cards} карт</span>

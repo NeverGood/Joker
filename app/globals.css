@@ -1363,6 +1363,10 @@ select.textField {
   display: none;
 }
 
+.mobileCurrentRoundJump {
+  display: none;
+}
+
 .mobileMiniLabel {
   display: none;
 }
@@ -2210,33 +2214,37 @@ select.textField {
 
   .mobileRoundsStack {
     display: grid;
-    gap: 12px;
+    gap: 14px;
+    scroll-snap-type: y proximity;
   }
 
   .mobileRoundCard {
     display: grid;
-    gap: 12px;
-    padding: 14px;
+    min-height: calc(100vh - 112px);
+    min-height: calc(100svh - 112px);
+    align-content: start;
+    gap: 10px;
+    padding: 12px;
     border: 1px solid rgba(242, 238, 229, 0.075);
     border-radius: 20px;
     background:
       radial-gradient(circle at top left, rgba(216, 175, 104, 0.065), transparent 42%),
       rgba(255, 255, 255, 0.018);
+    scroll-margin-top: 92px;
+    scroll-snap-align: start;
   }
 
   .mobileBlockSection {
     display: grid;
-    gap: 12px;
-    padding: 10px 0;
-    border: 1px solid rgba(216, 175, 104, 0.12);
-    border-radius: 20px;
-    background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.008)),
-      rgba(10, 12, 18, 0.44);
+    gap: 14px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
   }
 
   .mobileBlockSection + .mobileBlockSection {
-    margin-top: 18px;
+    margin-top: 14px;
   }
 
   .mobileRoundHeader {
@@ -2288,26 +2296,34 @@ select.textField {
 
   .mobileRoundPlayers {
     display: grid;
-    gap: 10px;
+    gap: 8px;
   }
 
   .mobileRoundPlayerCell {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 8px 10px;
     min-width: 0;
-    padding: 14px;
+    padding: 10px 12px;
     border: 1px solid rgba(242, 238, 229, 0.07);
     border-radius: 16px;
     background: rgba(5, 6, 8, 0.28);
   }
 
   .mobileRoundPlayerName {
+    grid-column: 1;
+    grid-row: 1;
     color: var(--text);
-    font-size: 1rem;
+    font-size: 0.98rem;
     font-weight: 800;
   }
 
   .mobileRoundPlayerCell .inlineFieldsRow {
+    grid-column: 1 / -1;
+    grid-row: 2;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
+    gap: 10px;
   }
 
   .mobileMiniLabel {
@@ -2335,6 +2351,16 @@ select.textField {
   .roundPlayerScore {
     min-height: 40px;
     font-size: 1rem;
+  }
+
+  .mobileRoundPlayerCell .roundPlayerScore {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+    width: auto;
+    min-width: 54px;
+    min-height: 30px;
+    padding-inline: 10px;
   }
 
   .mobileBlockSummary {
@@ -2371,6 +2397,41 @@ select.textField {
     color: var(--gold-strong);
     font-size: 1rem;
     font-variant-numeric: tabular-nums;
+  }
+
+  .mobileCurrentRoundJump {
+    position: fixed;
+    right: calc(16px + env(safe-area-inset-right));
+    bottom: calc(18px + env(safe-area-inset-bottom));
+    z-index: 80;
+    display: inline-flex;
+    min-height: 52px;
+    align-items: center;
+    justify-content: center;
+    padding: 0 16px;
+    border: 1px solid rgba(255, 221, 128, 0.72);
+    border-radius: 999px;
+    background:
+      radial-gradient(circle at top left, rgba(255, 221, 128, 0.34), transparent 42%),
+      linear-gradient(180deg, rgba(26, 27, 34, 0.98), rgba(8, 10, 15, 0.96));
+    box-shadow:
+      0 16px 36px rgba(0, 0, 0, 0.52),
+      0 0 26px rgba(216, 175, 104, 0.2),
+      0 0 0 1px rgba(255, 236, 172, 0.12) inset;
+    color: #ffe4a1;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 900;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(12px) scale(0.96);
+    transition: opacity 0.18s ease, transform 0.18s ease;
+  }
+
+  .mobileCurrentRoundJumpVisible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
   }
 
   .leaderboardTable {
@@ -2672,14 +2733,6 @@ select.textField {
     0 0 34px rgba(216, 175, 104, 0.18);
 }
 
-.mobileRoundCardCurrent::before {
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 5px;
-  background: linear-gradient(180deg, #ffe6a3, rgba(216, 175, 104, 0.44));
-  content: '';
-}
-
 .mobileRoundCardCurrent .mobileRoundEyebrow,
 .mobileRoundCardCurrent .dealerPill {
   color: #ffe4a1;
@@ -2709,7 +2762,13 @@ select.textField {
   }
 
   .mobileRoundPlayerCell .roundPlayerScore {
-    min-height: 40px;
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+    width: auto;
+    min-width: 54px;
+    min-height: 30px;
+    padding-inline: 10px;
     font-size: 1rem;
   }
 }
