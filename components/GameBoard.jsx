@@ -10,6 +10,7 @@ import {
   calculateTotals,
   createEmptyGameState,
   DEFAULT_PLAYERS,
+  formatCardCount,
   getLastBidRestriction,
   getInvalidTrickTotalRounds,
   getRoundTrickTotal,
@@ -1010,7 +1011,7 @@ function RoundCard({
     <article ref={currentRoundRef} className={isCurrentRound ? 'mobileRoundCard mobileRoundCardCurrent' : 'mobileRoundCard'}>
       <div className="mobileRoundHeader">
         <div>
-          <span className="mobileRoundEyebrow">{round.cards} карт</span>
+          <span className="mobileRoundEyebrow">{formatCardCount(round.cards)}</span>
           <span className="dealerLabel">Раздает</span>
           <span className="dealerPill">{currentGame.players[round.dealerKey] || DEFAULT_PLAYERS[round.dealerKey]}</span>
         </div>

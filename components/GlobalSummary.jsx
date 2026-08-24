@@ -1,7 +1,7 @@
 'use client';
 
 import { Fragment, useEffect, useMemo, useState } from 'react';
-import { DEFAULT_PLAYERS, PLAYER_KEYS } from '../lib/game-config';
+import { DEFAULT_PLAYERS, formatCardCount, PLAYER_KEYS } from '../lib/game-config';
 import { buildGameProtocol, formatDurationSeconds } from '../lib/game-storage';
 import AddPlayerForm, { mergePlayerList } from './AddPlayerForm';
 import ScoreboardShell from './ScoreboardShell';
@@ -1036,7 +1036,7 @@ function GameProtocolView({ game }) {
                 <td>
                   <div className="protocolRoundMeta">
                     <strong>Ход {round.hand}</strong>
-                    <span>{round.cards} карт</span>
+                    <span>{formatCardCount(round.cards)}</span>
                     <span>Раздает {round.dealerName}</span>
                   </div>
                 </td>

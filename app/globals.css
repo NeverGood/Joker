@@ -2745,20 +2745,54 @@ select.textField {
 
 @media (max-width: 700px) {
   .mobileRoundPlayerCell .miniFieldGroup {
-    gap: 8px;
+    gap: 5px;
   }
 
   .mobileRoundPlayerCell .miniSelect {
-    height: 58px;
-    min-height: 58px;
-    padding: 0 46px 0 16px;
-    border-radius: 16px;
+    height: 52px;
+    min-height: 52px;
+    padding: 0 42px 0 14px;
+    border-radius: 15px;
     background:
-      linear-gradient(45deg, transparent 50%, rgba(255, 230, 170, 0.78) 50%) right 24px center / 8px 8px no-repeat,
-      linear-gradient(135deg, rgba(255, 230, 170, 0.78) 50%, transparent 50%) right 17px center / 8px 8px no-repeat,
+      linear-gradient(45deg, transparent 50%, rgba(255, 230, 170, 0.78) 50%) right 22px center / 7px 7px no-repeat,
+      linear-gradient(135deg, rgba(255, 230, 170, 0.78) 50%, transparent 50%) right 16px center / 7px 7px no-repeat,
       rgba(7, 9, 14, 0.88);
-    font-size: 1.08rem;
+    font-size: 1rem;
     font-weight: 800;
+  }
+
+  .mobileRoundPlayerCell {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 7px 10px;
+    padding: 10px 12px;
+  }
+
+  .mobileRoundPlayerName {
+    grid-column: 1;
+    grid-row: 1;
+    min-width: 0;
+    overflow: hidden;
+    font-size: 1.02rem;
+    line-height: 1.05;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .mobileRoundPlayerCell .inlineFieldsRow {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+  }
+
+  .mobileRoundPlayerCell .mobileMiniLabel {
+    margin: 0;
+    color: rgba(242, 238, 229, 0.42);
+    font-size: 0.54rem;
+    line-height: 1;
+    letter-spacing: 0.12em;
   }
 
   .mobileRoundPlayerCell .roundPlayerScore {
@@ -2766,9 +2800,10 @@ select.textField {
     grid-row: 1;
     justify-self: end;
     width: auto;
-    min-width: 54px;
+    min-width: 50px;
     min-height: 30px;
     padding-inline: 10px;
-    font-size: 1rem;
+    border-radius: 999px;
+    font-size: 0.96rem;
   }
 }
