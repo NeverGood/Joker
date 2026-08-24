@@ -569,6 +569,8 @@ export default function GameBoard({ registeredPlayers = [], readOnly = false }) 
           title: gameTitle,
           players: currentGame.players,
           totals,
+          warnings: currentGame.warnings,
+          penalties: currentGame.penalties,
           rounds: currentGame.rounds,
           durationSeconds: gameDurationSeconds
         })

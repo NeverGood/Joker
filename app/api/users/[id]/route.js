@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '../../../../lib/prisma';
 import { requireAdminUser } from '../../../../lib/auth';
-import { buildGameProtocol } from '../../../../lib/game-storage';
+import { buildScoresPayload, parseScoresPayload } from '../../../../lib/game-storage';
 
 const PLAYER_NAME_FIELDS = ['player1Name', 'player2Name', 'player3Name', 'player4Name'];
 
@@ -11,24 +11,6 @@ function cleanUsername(value) {
 
 function getPlayerKeyByNameField(field) {
   return field.replace('Name', '');
-}
-
-function parseRoundsFromScores(scoresJson) {
-  if (!scoresJson) {
-    return {};
-  }
-
-  try {
-    const parsed = JSON.parse(scoresJson);
-
-    if (parsed?.rounds && typeof parsed.rounds === 'object') {
-      return parsed.rounds;
-    }
-
-    return parsed && typeof parsed === 'object' ? parsed : {};
-  } catch {
-    return {};
-  }
 }
 
 function buildUpdatedGameData(game, oldUsername, newUsername) {
@@ -49,10 +31,10 @@ function buildUpdatedGameData(game, oldUsername, newUsername) {
   });
 
   if (hasPlayerRename && game.scoresJson) {
-    const rounds = parseRoundsFromScores(game.scoresJson);
-    data.scoresJson = JSON.stringify({
-      rounds,
-      protocol: buildGameProtocol(players, rounds)
+    const { rounds, warnings, penalties } = parseScoresPayload(game.scoresJson, players);
+    data.scoresJson = buildScoresPayload(players, rounds, {
+      warnings,
+      penalties
     });
   }
 
