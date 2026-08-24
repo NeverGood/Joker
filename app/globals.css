@@ -2220,8 +2220,6 @@ select.textField {
 
   .mobileRoundCard {
     display: grid;
-    min-height: calc(100vh - 112px);
-    min-height: calc(100svh - 112px);
     align-content: start;
     gap: 10px;
     padding: 12px;
@@ -2252,6 +2250,21 @@ select.textField {
     align-items: center;
     justify-content: space-between;
     gap: 10px;
+  }
+
+  .mobileRoundMeta {
+    display: grid;
+    flex: 1 1 auto;
+    min-width: 0;
+    align-items: center;
+    grid-template-columns: auto minmax(42px, 1fr) auto;
+    gap: 6px;
+  }
+
+  .mobileRoundMeta .dealerLabel {
+    justify-self: center;
+    margin: 0;
+    transform: translateY(1px);
   }
 
   .mobileRoundHeader strong {

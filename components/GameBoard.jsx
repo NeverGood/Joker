@@ -1010,7 +1010,7 @@ function RoundCard({
   return (
     <article ref={currentRoundRef} className={isCurrentRound ? 'mobileRoundCard mobileRoundCardCurrent' : 'mobileRoundCard'}>
       <div className="mobileRoundHeader">
-        <div>
+        <div className="mobileRoundMeta">
           <span className="mobileRoundEyebrow">{formatCardCount(round.cards)}</span>
           <span className="dealerLabel">Раздает</span>
           <span className="dealerPill">{currentGame.players[round.dealerKey] || DEFAULT_PLAYERS[round.dealerKey]}</span>
